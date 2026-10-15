@@ -1,0 +1,10 @@
+const express=require('express');
+const auth=require('../middleware/adminAuth');
+const controller=require('../controllers/adminApprovalController');
+const limit=require('../utils/accountRateLimit');
+const router=express.Router();
+router.use(auth);
+router.get('/',controller.list);
+router.get('/:accountId',controller.detail);
+router.post('/:accountId/review',limit(30),controller.review);
+module.exports=router;

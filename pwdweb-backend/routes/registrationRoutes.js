@@ -1,0 +1,1 @@
+const express=require('express');const controller=require('../controllers/registrationController');const limit=require('../utils/accountRateLimit');const router=express.Router();router.use(limit(15));router.post('/',controller.register);router.post('/resend',controller.resend);router.post('/verify',controller.verify);module.exports=router;

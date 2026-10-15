@@ -1,0 +1,12 @@
+const express = require('express');
+const portalAuth = require('../middleware/messagingAuth');
+const controller = require('../controllers/messageController');
+const router = express.Router();
+router.use(portalAuth);
+router.get('/contacts',controller.getContacts);
+router.get('/conversations',controller.getConversations);
+router.post('/conversations',controller.createConversation);
+router.get('/conversations/:id/messages',controller.getMessages);
+router.post('/conversations/:id/messages',controller.sendMessage);
+router.patch('/conversations/:id/read',controller.markConversationRead);
+module.exports = router;

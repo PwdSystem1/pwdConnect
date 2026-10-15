@@ -1,0 +1,1 @@
+const express=require('express');const {loginUser}=require('../controllers/authController');const limit=require('../utils/accountRateLimit');const router=express.Router();router.post('/login',limit(30),loginUser);module.exports=router;

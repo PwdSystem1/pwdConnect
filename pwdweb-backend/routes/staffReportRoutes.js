@@ -1,0 +1,11 @@
+const express=require('express');
+const portalAuth=require('../middleware/portalAuth');
+const controller=require('../controllers/staffReportController');
+const router=express.Router();
+router.use(portalAuth);
+router.use((req,res,next)=>{if(req.portalAccount.kind!=='staff')return res.status(403).json({success:false,message:'Reports are available to staff only.'});next();});
+router.get('/',controller.getReport);
+router.get('/members',require('../controllers/reportMembersController').getMembers);
+router.get('/activity',controller.getActivity);
+router.get('/export.csv',controller.exportCsv);
+module.exports=router;

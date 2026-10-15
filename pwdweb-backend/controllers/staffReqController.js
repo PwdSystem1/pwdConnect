@@ -1,0 +1,4 @@
+const {visible,assertVisible}=require('../utils/operationalArchive');
+const db=require('../config/db');
+exports.getAllServiceRequests=async(req,res)=>{try{const pwd=typeof req.query.pwd_id==='string'?req.query.pwd_id.trim():'';const [rows]=await db.execute(`SELECT sr.id,sr.service_type,sr.description,sr.pwd_id,sr.full_name,sr.baranggay,sr.status,sr.created_at,d.id AS delivery_id,DATE_FORMAT(d.delivered_at,'%Y-%m-%d %H:%i:%s') AS delivered_at,d.staff_username AS delivered_by FROM service_request sr LEFT JOIN service_assistance_deliveries d ON d.request_id=sr.id WHERE ${visible('service','sr.id')} ${pwd?'AND sr.pwd_id=?':''} ORDER BY sr.id DESC`,pwd?[pwd]:[]);res.json({success:true,requests:rows});}catch(error){console.error('Staff service requests:',error.code);res.status(503).json({success:false,message:'Unable to load requests. Check the QR workflow migration.'});}};
+exports.updateServiceRequestStatus=require('../utils/requestTracking').updateStatus;

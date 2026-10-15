@@ -1,0 +1,6 @@
+const resetGeneration=require('./resetGeneration');
+const crypto=require('node:crypto');
+function secret(){const value=process.env.PORTAL_TOKEN_SECRET;if(!value||value.length<32)throw Error('Set PORTAL_TOKEN_SECRET in backend .env.');return value+resetGeneration.suffix();}
+function signAdmin(id){const payload=Buffer.from(JSON.stringify({id,purpose:'admin-access',exp:Math.floor(Date.now()/1000)+3600})).toString('base64url');return payload+'.'+crypto.createHmac('sha256',secret()).update('admin-access:'+payload).digest('base64url');}
+function verifyAdmin(token){if(typeof token!=='string'||token.length>1024)throw Error('Invalid token');const [payload,signature,...rest]=token.split('.');if(rest.length||!signature)throw Error('Invalid token');const expected=crypto.createHmac('sha256',secret()).update('admin-access:'+payload).digest(),actual=Buffer.from(signature,'base64url');if(expected.length!==actual.length||!crypto.timingSafeEqual(expected,actual))throw Error('Invalid token');const value=JSON.parse(Buffer.from(payload,'base64url'));if(value.purpose!=='admin-access'||!Number.isInteger(value.id)||value.id<1||!Number.isFinite(value.exp)||value.exp<=Math.floor(Date.now()/1000))throw Error('Invalid token');return value;}
+module.exports={signAdmin,verifyAdmin};

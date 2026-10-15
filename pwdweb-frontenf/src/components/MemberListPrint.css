@@ -1,0 +1,17 @@
+.member-list-print-sheet { display: none; }
+@media print {
+ @page member-register { size: A4 landscape; margin: 12mm; }
+ body[data-member-list-print="true"] #root { display: none !important; }
+ body[data-member-list-print="true"], body[data-member-list-print="true"] html { background: white !important; color: #111827 !important; }
+ body[data-member-list-print="true"] .member-list-print-sheet { display: block !important; page: member-register; font-family: Arial, sans-serif; font-size: 10pt; color: #111827; background: white; }
+ .member-list-print-sheet h1 { font-size: 16pt; font-weight: bold; margin: 0 0 8px; }
+ .member-list-print-sheet > p { margin: 5px 0; }
+ .member-list-print-sheet table { width: 100%; min-width: 0; table-layout: fixed; border-collapse: collapse; margin-top: 18px; font-size: 9pt; }
+ .member-list-print-sheet th, .member-list-print-sheet td { border: 1px solid #cbd5e1; padding: 6px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+ .member-list-print-sheet th:first-child { width: 4%; }
+ .member-list-print-sheet th:nth-child(3) { width: 24%; }
+ .member-list-print-sheet thead { display: table-header-group; }
+ .member-list-print-sheet tr { break-inside: avoid; }
+ .member-list-print-sheet .overflow-x-auto { overflow: visible !important; }
+ .member-list-print-sheet footer { margin-top: 28px; font-size: 9pt; break-inside: avoid; }
+}

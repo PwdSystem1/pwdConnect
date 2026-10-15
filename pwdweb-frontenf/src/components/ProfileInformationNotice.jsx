@@ -1,0 +1,6 @@
+import {ClipboardList} from 'lucide-react';
+import {portalTheme} from './portalTheme';
+export default function ProfileInformationNotice({missing,themeMode,onEdit,disabled}){
+ const t=portalTheme(themeMode);if(!missing.length)return null;const editable=missing.filter(f=>f.editable),staff=missing.filter(f=>!f.editable);
+ return <section aria-label="Incomplete profile information" className={`rounded-2xl p-5 mb-6 ${t.card}`}><h2 className="font-bold flex items-center gap-2"><ClipboardList className="size-5"/>Complete your profile information</h2><p className={`text-[0.85em] mt-2 ${t.muted}`}>Some details are not recorded yet. This reminder does not change your account approval or PWD ID status.</p>{editable.length>0&&<div className={`mt-4 p-4 rounded-xl ${t.tile}`}><p className="font-semibold text-[0.9em]">You can update</p><p className="text-[0.85em] mt-2">{editable.map(f=>f.label).join(', ')}</p><button type="button" disabled={disabled} onClick={onEdit} className={`mt-3 px-4 py-3 rounded-lg font-semibold disabled:opacity-50 ${t.primary} ${t.focus}`}>Update editable information</button></div>}{staff.length>0&&<div className="mt-4"><p className="font-semibold text-[0.9em]">Ask LGU staff to update</p><p className={`text-[0.85em] mt-2 ${t.muted}`}>{staff.map(f=>f.label).join(', ')}</p></div>}</section>;
+}

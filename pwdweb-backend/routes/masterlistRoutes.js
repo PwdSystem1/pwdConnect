@@ -1,0 +1,11 @@
+const express=require('express');
+const portalAuth=require('../middleware/portalAuth');
+const controller=require('../controllers/masterlistController');
+const router=express.Router();
+router.use(portalAuth);
+router.use((req,res,next)=>req.portalAccount.kind==='staff'?next():res.status(403).json({success:false,message:'Member records can only be managed by staff.'}));
+router.get('/',controller.getAllMembers);
+router.post('/',controller.addMember);
+router.put('/:id',controller.updateMember);
+router.delete('/:id',controller.deleteMember);
+module.exports=router;

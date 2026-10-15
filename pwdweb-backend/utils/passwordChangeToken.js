@@ -1,0 +1,6 @@
+const resetGeneration=require('./resetGeneration');
+const crypto=require('node:crypto');
+function secret(){const s=process.env.PORTAL_TOKEN_SECRET;if(!s||s.length<32)throw Error('Configure PORTAL_TOKEN_SECRET.');return s+resetGeneration.suffix();}
+function signChange(kind,username,version){const p=Buffer.from(JSON.stringify({purpose:'password-change',kind,username,version,exp:Math.floor(Date.now()/1000)+900})).toString('base64url');return p+'.'+crypto.createHmac('sha256',secret()).update('password-change:'+p).digest('base64url');}
+function verifyChange(token){if(typeof token!=='string'||token.length>2048)throw Error('Invalid token.');const [p,s,...extra]=token.split('.');if(!p||!s||extra.length)throw Error('Invalid token.');const a=Buffer.from(s,'base64url'),b=crypto.createHmac('sha256',secret()).update('password-change:'+p).digest();if(a.length!==b.length||!crypto.timingSafeEqual(a,b))throw Error('Invalid token.');const v=JSON.parse(Buffer.from(p,'base64url'));if(v.purpose!=='password-change'||!['user','staff'].includes(v.kind)||typeof v.username!=='string'||!v.username||!Number.isSafeInteger(v.version)||!Number.isFinite(v.exp)||v.exp<=Date.now()/1000)throw Error('Expired token.');return v;}
+module.exports={signChange,verifyChange};

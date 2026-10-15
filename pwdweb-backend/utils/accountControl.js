@@ -1,0 +1,3 @@
+const db=require('../config/db');
+async function control(kind,username,connection=db){const role=kind==='staff'?'staff':'member',table=role==='staff'?'staffdata':'userdata',column=role==='staff'?'staff_username':'acc_username';const [rows]=await connection.execute(`SELECT p.id,COALESCE(c.account_status,'Active') AS managed_status,COALESCE(c.must_change_password,0) AS must_change_password,COALESCE(c.session_version,0) AS session_version FROM ${table} p LEFT JOIN admin_account_controls c ON c.account_kind=? AND c.record_id=p.id WHERE BINARY p.${column}=? LIMIT 2`,[role,username]);return rows.length===1?rows[0]:null;}
+module.exports={control};

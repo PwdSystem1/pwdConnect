@@ -1,0 +1,6 @@
+const test=require('node:test'),assert=require('node:assert/strict'),{analyse,pool}=require('../pwdweb-backend/utils/applicationDataRules');
+test('quoted question marks do not consume WHERE arguments',()=>{const q=analyse("UPDATE userdata SET first_name='Who?',last_name=? WHERE id=?",['Reyes',7]);assert.deepEqual(q.whereValues,[7]);});
+test('subquery WHERE cannot replace the top-level mutation WHERE',()=>{const q=analyse('UPDATE userdata SET email=(SELECT email FROM pending_accounts WHERE id=?) WHERE id=?',[4,7]);assert.deepEqual(q.whereValues,[7]);});
+test('ordinary reporting SELECTs are not treated as source mutations',()=>assert.equal(analyse('SELECT * FROM report_activity WHERE source_table=?',['userdata']),null));
+test('protected writes reject multi-statements and insert-select before writing',()=>{assert.throws(()=>analyse('UPDATE userdata SET age=? WHERE id=?; DELETE FROM userdata',[20,7]));assert.throws(()=>analyse('INSERT INTO userdata SELECT * FROM other'));});
+test('wrong database marker blocks all pool writes',async()=>{let mutations=0;const db=pool({execute:async sql=>{if(sql.startsWith('SELECT variant'))return [[{variant:'original'}]];mutations++;return [{}];}});await assert.rejects(()=>db.execute('DELETE FROM userdata WHERE id=?',[7]),{code:'PWD_COPY_DATABASE_REQUIRED'});assert.equal(mutations,0);});

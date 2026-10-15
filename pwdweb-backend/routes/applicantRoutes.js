@@ -1,0 +1,11 @@
+const express = require('express');
+const auth = require('../middleware/applicantAuth');
+const controller = require('../controllers/applicantController');
+const limit = require('../utils/accountRateLimit');
+const router = express.Router();
+router.use(auth);
+router.get('/session',controller.session);
+router.put('/profile',limit(30),controller.saveProfile);
+router.post('/application',limit(30),controller.submitApplication);
+router.post('/enter-member-portal',limit(30),controller.enterMemberPortal);
+module.exports = router;

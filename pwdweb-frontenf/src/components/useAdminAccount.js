@@ -1,0 +1,2 @@
+import {useEffect,useState} from 'react';import {useNavigate} from 'react-router-dom';import {adminRequest} from './adminApi';
+export default function useAdminAccount(){const navigate=useNavigate();const [user,setUser]=useState(null);useEffect(()=>{const controller=new AbortController();adminRequest('/admin-access/session',{signal:controller.signal}).then(data=>setUser(data.admin)).catch(error=>{if(error.name!=='AbortError'){sessionStorage.removeItem('adminAccessToken');navigate('/?login=admin',{replace:true});}});return()=>controller.abort();},[navigate]);return user;}

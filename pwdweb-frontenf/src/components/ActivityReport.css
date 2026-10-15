@@ -1,0 +1,39 @@
+.report-print-only { display: none; }
+.report-table th, .report-table td { padding: 12px; border-bottom: 1px solid #94a3b844; vertical-align: top; overflow-wrap: anywhere; }
+.report-table th { font-weight: 700; }
+.report-table { min-width: 640px; }
+@media print {
+  @page { size: A4 portrait; margin: 14mm; }
+  html, body, #root { background: white !important; color: #111827 !important; font-size: 10pt !important; }
+  :is(.staff-shell, .admin-shell) { display: block !important; min-height: 0 !important; font-size: 10pt !important; background: white !important; }
+  :is(.staff-shell, .admin-shell) > aside, :is(.staff-shell, .admin-shell) header, .staff-content > h1, .report-no-print { display: none !important; }
+  .staff-content { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+  :is(.staff-shell, .admin-shell) .report-sheet, :is(.staff-shell, .admin-shell) .report-sheet * { color: #111827 !important; box-shadow: none !important; }
+  .report-sheet > div, .report-metrics > article, .report-charts > div { background: white !important; border-color: #cbd5e1 !important; border-radius: 4px !important; }
+  .report-print-only { display: block; }
+  .report-metrics { display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; }
+  .report-metrics article { padding: 12px !important; break-inside: avoid; }
+  .report-charts { display: grid !important; grid-template-columns: 1fr !important; }
+  .report-chart, .report-charts > div { break-inside: avoid; }
+  .report-chart svg [stroke="#ffffff"] { stroke: #16a34a !important; }
+  .report-chart svg [fill="#ffffff"] { fill: #16a34a !important; }
+  .report-chart svg [stroke="#facc15"] { stroke: #0284c7 !important; }
+  .report-chart svg [fill="#facc15"] { fill: #0284c7 !important; }
+  .report-chart svg [stroke="#fb923c"] { stroke: #9333ea !important; }
+  .report-chart svg [fill="#fb923c"] { fill: #9333ea !important; }
+  .member-encoding-chart svg rect { fill: #0284c7 !important; }
+  [data-report-series="requests"] { background: #0284c7 !important; }
+  [data-report-series="approvals"] { background: #16a34a !important; }
+  [data-report-series="members"] { background: #9333ea !important; }
+  .report-chart span[style] { border: 1px solid #64748b; }
+  .report-table { min-width: 0; table-layout: fixed; font-size: 8pt; }
+  .report-table th, .report-table td { padding: 6px; }
+  .report-table thead { display: table-header-group; }
+  .report-table tr { break-inside: avoid; }
+  .report-sheet .overflow-x-auto { overflow: visible !important; }
+  .report-sheet { width: 100%; }
+  .report-sheet * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}
+
+@media print { .member-encoding-chart { break-inside: avoid; } .member-encoding-chart .encoding-desktop { display: block !important; } .member-encoding-chart .encoding-mobile, .member-encoding-chart details { display: none !important; } }
+

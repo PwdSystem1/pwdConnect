@@ -60,3 +60,34 @@
  .report-mobile-cards { display: none !important; }
  .report-desktop-table { display: block !important; overflow: visible !important; }
 }
+
+/* Allocate desktop columns explicitly so a long message cannot squeeze identities. */
+@media screen and (min-width: 768px) {
+ .report-desktop-table { overflow-x: auto; }
+ .report-desktop-table .report-table { table-layout: fixed; }
+ .report-desktop-table .report-table th { overflow-wrap: normal; word-break: normal; }
+ .report-activity-table { min-width: 1000px; }
+ .report-activity-table th:nth-child(1) { width: 16%; }
+ .report-activity-table th:nth-child(2) { width: 18%; }
+ .report-activity-table th:nth-child(3) { width: 23%; }
+ .report-activity-table th:nth-child(4) { width: 15%; }
+ .report-activity-table th:nth-child(5) { width: 28%; }
+ .report-service-table { min-width: 900px; }
+ .report-service-table th:nth-child(1) { width: 18%; }
+ .report-service-table th:nth-child(2) { width: 24%; }
+ .report-service-table th:nth-child(3) { width: 18%; }
+ .report-service-table th:nth-child(4) { width: 24%; }
+ .report-service-table th:nth-child(5) { width: 16%; }
+ .report-desktop-table .member-register-table { min-width: 1250px; }
+ .member-register-table th:nth-child(1) { width: 5% !important; }
+ .member-register-table th:nth-child(2) { width: 12%; }
+ .member-register-table th:nth-child(3) { width: 19% !important; }
+ .member-register-table th:nth-child(4) { width: 10%; }
+ .member-register-table th:nth-child(5) { width: 6%; }
+ .member-register-table th:nth-child(6) { width: 12% !important; }
+ .member-register-table th:nth-child(7) { width: 13%; }
+ .member-register-table th:nth-child(8) { width: 13%; }
+ .member-register-table th:nth-child(9) { width: 10%; }
+ .member-register-table th:nth-child(10) { width: 13%; }
+}
+

@@ -1,3 +1,4 @@
+import PageSpeech from './components/PageSpeech';
 import PublicDetailsDialog from './components/PublicDetailsDialog';
 import StaffMembership from './staffDashboard/staffMembership';
 import AdminSystemSettings from './adminDashboard/adminSystemSettings';
@@ -277,8 +278,9 @@ function AccessibilityDropdown({
 
       {isOpen && (
         <div
-          className={`absolute right-0 mt-2 w-80 max-w-[90vw] max-h-[75vh] overflow-y-auto rounded-xl shadow-xl p-5 z-50 border ${getPanelStyles()}`}
+          className={`fixed left-3 right-3 top-24 w-auto max-w-none max-h-[calc(100dvh-7rem)] overflow-y-auto overscroll-contain sm:absolute sm:left-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80 sm:max-h-[75vh] rounded-xl shadow-xl p-4 sm:p-5 z-50 border ${getPanelStyles()}`}
         >
+          <div className="flex items-center justify-between gap-3 mb-4"><h2 className="font-bold">Accessibility</h2><button type="button" onClick={()=>setIsOpen(false)} aria-label="Close accessibility settings" className={`min-h-11 px-3 rounded-lg border ${focusRing}`}>Close</button></div>
           {/* Display Mode Switcher */}
           <div>
             <p className={`text-[0.8em] font-semibold mb-2 ${labelStyles}`}>
@@ -378,8 +380,8 @@ function AccessibilityDropdown({
             </div>
           </div>
           <label htmlFor="landing-speech-language" className="block text-[0.8em] font-semibold mt-5 mb-2">Speak language</label>
-          <select id="landing-speech-language" value={language} onChange={e=>{setLanguage(e.target.value);stopSpeech();}} className={`w-full p-3 rounded-lg border ${focusRing} ${getPanelStyles()}`}><option value="en">English</option><option value="fil">Filipino / Tagalog</option></select>
-          <p className={`text-[0.75em] mt-2 ${labelStyles}`}>Choose a language, then use Speak beside a section. Online speech sends the selected text to Microsoft Azure.</p>
+          <select id="landing-speech-language" value={language} onChange={e=>{setLanguage(e.target.value);stopSpeech();}} className={`w-full p-3 rounded-lg border ${focusRing} ${getPanelStyles()}`}><option value="en">English</option><option value="fil" disabled>Filipino / Tagalog — unavailable</option></select>
+          <p className={`text-[0.75em] mt-2 ${labelStyles}`}>Use Read page below or Speak beside a section. English uses your device voice. Tagalog is currently unavailable.</p><PageSpeech/>
         </div>
       )}
     </div>
@@ -407,7 +409,7 @@ function TTSControls({ textToSpeak, onStop }) {
   if(language==='fil'&&!translated){setNotice('Wala pang Filipino translation para sa tekstong ito. Piliin muna ang English.');return;}
   speakSpeech(language==='fil'?translated:textToSpeak,language,setNotice);
  };
- return <div><div className="flex flex-wrap items-center gap-2"><button type="button" onClick={handleSpeak} className="flex items-center gap-1.5 text-[0.8em] font-semibold bg-sky-700 text-white hover:bg-sky-800 px-3.5 py-2 min-h-10 rounded-lg transition cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-sky-400" title="Speak Text — uses Microsoft Azure online voice"><Icon name="speaker" className="w-4 h-4"/>Speak</button><button type="button" onClick={()=>{onStop();setNotice('');}} className="flex items-center gap-1.5 text-[0.8em] font-semibold border-2 border-current bg-transparent hover:opacity-70 px-3.5 py-2 min-h-10 rounded-lg transition cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-sky-400" title="Stop Speech"><Icon name="stop" className="w-4 h-4"/>Stop</button></div>{notice&&<p role="status" className="text-[0.8em] mt-2 max-w-sm">{notice}</p>}</div>;
+ return <div><div className="flex flex-wrap items-center gap-2"><button type="button" onClick={handleSpeak} className="flex items-center gap-1.5 text-[0.8em] font-semibold bg-sky-700 text-white hover:bg-sky-800 px-3.5 py-2 min-h-10 rounded-lg transition cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-sky-400" title="Read text using the English device voice"><Icon name="speaker" className="w-4 h-4"/>Speak</button><button type="button" onClick={()=>{onStop();setNotice('');}} className="flex items-center gap-1.5 text-[0.8em] font-semibold border-2 border-current bg-transparent hover:opacity-70 px-3.5 py-2 min-h-10 rounded-lg transition cursor-pointer outline-none focus-visible:ring-4 focus-visible:ring-sky-400" title="Stop Speech"><Icon name="stop" className="w-4 h-4"/>Stop</button></div>{notice&&<p role="status" className="text-[0.8em] mt-2 max-w-sm">{notice}</p>}</div>;
 }
 
 // Heading ng bawat section
@@ -704,6 +706,7 @@ function LandingPage({
         </div>
       )}
 
+      <main id="landing-main-content">
       {/* 2. HERO SECTION */}
       <section id="home" className={`py-16 md:py-24 ${t.secA}`}>
         <div className="max-w-7xl mx-auto px-5 sm:px-8 grid md:grid-cols-2 gap-8 lg:gap-16 items-center">
@@ -1077,6 +1080,7 @@ function LandingPage({
         </div>
       </section>
 
+      </main>
       {/* 9. FOOTER */}
       <PublicFooter themeMode={themeMode}/>
 
@@ -1205,7 +1209,7 @@ function LandingPage({
 }
 
 export default function App() {
-  const [speechLanguage,setSpeechLanguage]=useState(()=>localStorage.getItem("public_speechLanguage")||"en");
+  const [speechLanguage,setSpeechLanguage]=useState(()=>"en");
   useEffect(()=>{localStorage.setItem("public_speechLanguage",speechLanguage);},[speechLanguage]);
   const [fontSize, setFontSize] = useState(
     () => localStorage.getItem("app_fontSize") || "text-base"

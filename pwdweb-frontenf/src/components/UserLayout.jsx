@@ -1,3 +1,4 @@
+import PageSpeech from './PageSpeech';
 import {logoutAccount} from './logoutAccount';
 import SpeechControls from './SpeechControls';
 import {stopSpeech} from './speechPlayer';
@@ -175,7 +176,7 @@ export default function UserLayout({ user, title, children, alertActive=false, f
             </section>}
           </div>
         </header>
-        <main className="p-4 sm:p-8 lg:p-10 w-full max-w-[1600px] mx-auto"><h1 className={`text-[1.6em] sm:text-[1.9em] font-bold tracking-tight mb-6 ${t.heading}`}>{title}</h1>{children}</main>
+        <main id="member-main-content" className="p-4 sm:p-8 lg:p-10 w-full max-w-[1600px] mx-auto"><h1 className={`text-[1.6em] sm:text-[1.9em] font-bold tracking-tight mb-6 ${t.heading}`}>{title}</h1><div className="mb-5"><PageSpeech/></div>{children}</main>
       </div>
     </div>
   );

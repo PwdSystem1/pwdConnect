@@ -1,42 +1,38 @@
-import {PORTAL_API} from './portalApi';
-let current=null,audioContext=null;
+// English device speech only. Never calls the suspended server voice endpoint.
+try{if(localStorage.getItem('public_speechLanguage')==='fil')localStorage.setItem('public_speechLanguage','en');}catch{}
+let current=null;
 export function stopSpeech(){
  const old=current;current=null;
- old?.abort.abort();
- if(old?.source){old.source.onended=null;try{old.source.stop();}catch{}}
- if(old?.audio){old.audio.pause();old.audio.removeAttribute('src');old.audio.load();}
- if(old?.url)URL.revokeObjectURL(old.url);
+ if(old){clearTimeout(old.timer);window.speechSynthesis?.removeEventListener('voiceschanged',old.load);}
  window.speechSynthesis?.cancel();
- old?.notice('');
- old?.done?.();
+ old?.notice('');old?.done?.();
 }
-function localVoice(text,language,task,reason){
- if(task.audio){task.audio.pause();task.audio.removeAttribute('src');task.audio.load();task.audio=null;}
- if(task.url){URL.revokeObjectURL(task.url);task.url=null;}
- const synth=window.speechSynthesis,voice=synth?.getVoices().find(v=>language==='fil'?/^(fil|tl)(-|_|$)/i.test(v.lang):/^en(-|_|$)/i.test(v.lang));
- if(!voice){current=null;task.notice(reason+(language==='fil'?' Walang Filipino voice sa device para sa fallback.':' No matching device voice is available.'));task.done?.();return;}
- const utterance=new SpeechSynthesisUtterance(text);utterance.voice=voice;utterance.lang=voice.lang;utterance.rate=0.95;
- utterance.onend=()=>{if(current===task){current=null;task.notice('');task.done?.();}};
- utterance.onerror=()=>{if(current===task){current=null;task.notice('Device speech could not continue.');task.done?.();}};
- task.notice(reason+' Using the matching device voice.');synth.speak(utterance);
-}
-export async function speakSpeech(text,language='en',notice=()=>{},done){
+export function speakSpeech(text,language='en',notice=()=>{},done){
  stopSpeech();
- const task={abort:new AbortController(),notice,done};current=task;
- if(!text||text.length>3000){current=null;notice('Choose text of at most 3,000 characters.');done?.();return;}
- notice(language==='fil'?'Inihahanda ang Filipino voice…':'Preparing English voice…');
- // Resume during the click gesture so mobile browsers can play the response.
- let unlocked=null;
- try{const Context=window.AudioContext||window.webkitAudioContext;if(Context){audioContext??=new Context();unlocked=audioContext.resume().then(()=>true,()=>false);}}catch{}
- let response;
- try{
-  response=await fetch(PORTAL_API+'/speech/synthesize',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,language}),signal:task.abort.signal});
+ if(language!=='en'){notice('Tagalog voice is currently unavailable. Please select English.');done?.();return;}
+ const synth=window.speechSynthesis;
+ if(!synth||!window.SpeechSynthesisUtterance){notice('This browser does not support voice reading. You can still read the text on screen.');done?.();return;}
+ if(typeof text!=='string'||!text.trim()){notice('There is no text to read yet.');done?.();return;}
+ const words=text.trim().slice(0,12000).split(/\s+/),chunks=[];let chunk='';
+ for(const word of words){if(chunk.length+word.length>200){chunks.push(chunk);chunk='';}chunk+=(chunk?' ':'')+word;}if(chunk)chunks.push(chunk);
+ const task={notice,done,index:0,timer:null,load:null};current=task;
+ function finish(message){if(current!==task)return;current=null;clearTimeout(task.timer);synth.removeEventListener('voiceschanged',task.load);notice(message);done?.();}
+ function next(){
   if(current!==task)return;
-  if(!response.ok){let message='Online voice is unavailable.';try{message=(await response.json()).message||message;}catch{}if(current===task)localVoice(text,language,task,message);return;}
-  if(!response.headers.get('content-type')?.includes('audio/'))throw Error('Invalid speech response');
-  const bytes=await response.arrayBuffer();if(current!==task)return;
-  if(unlocked&&await unlocked){const buffer=await audioContext.decodeAudioData(bytes);if(current!==task)return;const source=audioContext.createBufferSource();source.buffer=buffer;source.connect(audioContext.destination);task.source=source;source.onended=()=>{if(current===task){current=null;notice('');done?.();}};source.start();}
-  else{const url=URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'})),audio=new Audio(url);task.url=url;task.audio=audio;audio.onended=()=>{if(current===task)stopSpeech();};audio.onerror=()=>{if(current===task){stopSpeech();notice('Audio could not play. Tap Speak to try again.');}};await audio.play();if(current!==task)return;}
-  notice(language==='fil'?'Binabasa sa Filipino.':'Reading in English.');
- }catch(error){if(current!==task||error.name==='AbortError')return;localVoice(text,language,task,'Online voice could not be loaded.');}
+  if(task.index>=chunks.length){finish('Finished reading.');return;}
+  const voices=synth.getVoices(),voice=voices.find(v=>/^en([-_]|$)/i.test(v.lang));
+  if(voices.length&&!voice){finish('No English voice is available on this device. Enable an English text-to-speech voice in device settings.');return;}
+  const utterance=new SpeechSynthesisUtterance(chunks[task.index++]);task.utterance=utterance;
+  utterance.lang=voice?.lang||'en-US';if(voice)utterance.voice=voice;utterance.rate=0.95;
+  task.timer=setTimeout(()=>{if(current===task){stopSpeech();notice('Voice did not start. Tap Read to try again, or enable an English device voice.');}},10000);
+  utterance.onstart=()=>{if(current===task){clearTimeout(task.timer);notice('Reading in English.');}};
+  utterance.onend=()=>{clearTimeout(task.timer);next();};
+  utterance.onerror=()=>finish('Automatic voice may be blocked. Tap Read to hear the text.');
+  synth.resume();synth.speak(utterance);
+ }
+ let started=false;
+ task.load=()=>{if(started||current!==task)return;started=true;clearTimeout(task.timer);synth.removeEventListener('voiceschanged',task.load);next();};
+ notice('Preparing English device voice…');
+ if(synth.getVoices().length)task.load();
+ else{synth.addEventListener('voiceschanged',task.load);task.timer=setTimeout(task.load,800);}
 }

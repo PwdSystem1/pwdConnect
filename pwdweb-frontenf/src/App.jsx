@@ -83,10 +83,10 @@ const EVENTS = [
 
 // icon = pangalan ng SVG icon (hindi na emoji)
 const HOTLINES = [
-  { id: 1, name: "Municipal Hall", number: "(042) 585-1111", icon: "building" },
-  { id: 2, name: "PNP Police", number: "0998-598-5821", icon: "shield" },
-  { id: 3, name: "Fire Station", number: "(042) 585-2222", icon: "flame" },
-  { id: 4, name: "MDRRMO Rescue", number: "0912-345-6789", icon: "cross" },
+  { id: 1, name: "Municipal Hall", number: "(042) 585 4390", phones: [{label:"(042) 585 4390",dial:"0425854390"}], icon: "building" },
+  { id: 2, name: "Candelaria Police Station", number: "166 / 741-7244", phones: [{label:"166",dial:"166"},{label:"741-7244",dial:"7417244"}], icon: "shield" },
+  { id: 3, name: "Candelaria Fire Station", number: "585-4472", phones: [{label:"585-4472",dial:"5854472"}], icon: "flame" },
+  { id: 4, name: "MDRRM Office", number: "116", phones: [{label:"116",dial:"116"}], icon: "cross" },
 ];
 
 /* SIMPLE LINE ICONS (walang kailangang i-install na library) */
@@ -397,7 +397,7 @@ const FILIPINO_SPEECH = {
  "Livelihood Program. Skills development and employment support for Persons With Disabilities.": "Programa sa kabuhayan. Pagsasanay sa mga kasanayan at suporta sa paghahanap ng trabaho para sa mga taong may kapansanan.",
  "Livelihood Program Initiative. Skills development and employment support for Persons With Disabilities.": "Proyekto sa kabuhayan. Pagsasanay sa mga kasanayan at suporta sa trabaho para sa mga taong may kapansanan.",
  "Upcoming event: PWD Medical Mission & Checkup, on July 15, 2026, at Municipal Gym, 8:00 AM. Description: Free medical consultations, eye checkups, hearing assessments, and health screenings for registered PWD beneficiaries.": "Aktibidad: Medical mission at checkup para sa PWD. Hulyo kinse, dalawang libo at dalawampu't anim, sa Municipal Gym, alas otso ng umaga. Libreng konsultasyong medikal, pagsusuri sa mata at pandinig, at pagsusuring pangkalusugan para sa mga rehistradong benepisyaryong PWD.",
- "LGU Candelaria Office. Municipal Hall Compound, Poblacion, Candelaria, Quezon.": "Opisina ng pamahalaang lokal ng Candelaria. Municipal Hall Compound, Poblacion, Candelaria, Quezon.",
+ "LGU Candelaria Quezon. Municipal Hall Compound, Poblacion, Candelaria, Quezon.": "Opisina ng pamahalaang lokal ng Candelaria. Municipal Hall Compound, Poblacion, Candelaria, Quezon.",
  "PDAO Candelaria Division. Welfare Building, Municipal Compound.": "Dibisyon ng PDAO sa Candelaria. Welfare Building, Municipal Compound."
 };
 function TTSControls({ textToSpeak, onStop }) {
@@ -991,12 +991,12 @@ function LandingPage({
               <div>
                 <div className="flex justify-between items-start gap-3">
                   <h3 className={`text-[1.6em] font-bold leading-tight ${t.heading}`}>
-                    LGU Candelaria Office
+                    LGU Candelaria Quezon
                   </h3>
                 </div>
                 <div className="mt-3">
                   <TTSControls
-                    textToSpeak="LGU Candelaria Office. Municipal Hall Compound, Poblacion, Candelaria, Quezon."
+                    textToSpeak="LGU Candelaria Quezon. Municipal Hall Compound, Poblacion, Candelaria, Quezon."
                     onStop={handleStopSpeech}
                   />
                 </div>
@@ -1008,11 +1008,15 @@ function LandingPage({
                   <span>Municipal Hall Compound, Poblacion, Candelaria, Quezon</span>
                 </p>
               </div>
-              <button
+              <a
+                href="https://www.facebook.com/dessicatedcoconutcapitaloftheworld"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit LGU Candelaria Quezon Facebook page (opens in a new tab)"
                 className={`mt-8 px-6 py-3 min-h-12 rounded-lg w-fit font-semibold cursor-pointer transition ${focusRing} ${t.outline}`}
               >
                 Visit Facebook Page
-              </button>
+              </a>
             </div>
 
             <div className={`rounded-2xl p-8 flex flex-col justify-between ${t.card}`}>
@@ -1037,9 +1041,12 @@ function LandingPage({
                 </p>
               </div>
               <button
-                className={`mt-8 px-6 py-3 min-h-12 rounded-lg w-fit cursor-pointer transition ${focusRing} ${t.primary}`}
+                type="button"
+                disabled
+                aria-label="PDAO Facebook link is not yet available"
+                className={`mt-8 px-6 py-3 min-h-12 rounded-lg w-fit font-semibold opacity-60 cursor-not-allowed ${t.primary}`}
               >
-                Visit Facebook Page
+                Facebook link coming soon
               </button>
             </div>
           </div>
@@ -1052,7 +1059,7 @@ function LandingPage({
           <SectionHeading
             t={t}
             title="Emergency Hotlines"
-            subtitle="Immediate responsive lines available 24/7 across Candelaria."
+            subtitle="Contact the municipal office and emergency services using the numbers below."
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-12">
@@ -1071,9 +1078,9 @@ function LandingPage({
                   />
                 </div>
                 <h3 className={`text-[1.2em] font-bold ${t.heading}`}>{hotline.name}</h3>
-                <p className={`mt-1 font-bold text-[1.6em] tabular-nums ${t.alertText}`}>
-                  {hotline.number}
-                </p>
+                <div className={`mt-1 flex flex-wrap items-center gap-x-2 font-bold text-[1.6em] tabular-nums ${t.alertText}`}>
+                  {hotline.phones.map((phone,index)=><React.Fragment key={phone.dial}>{index>0&&<span aria-hidden="true">/</span>}<a href={`tel:${phone.dial}`} aria-label={`Call ${hotline.name} at ${phone.label}`} className={`min-h-11 inline-flex items-center rounded-md underline underline-offset-4 ${focusRing}`}>{phone.label}</a></React.Fragment>)}
+                </div>
               </div>
             ))}
           </div>

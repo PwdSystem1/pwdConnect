@@ -1,5 +1,5 @@
 const crypto=require('node:crypto'),db=require('../config/db');
-const nodemailer=require('nodemailer');
+const nodemailer=require('./emailTransport');
 const {emailSettings}=require('./registrationEmail');
 const normalize=value=>String(value||'').trim().toLowerCase();
 const digest=token=>crypto.createHash('sha256').update(token).digest('hex');
@@ -19,7 +19,7 @@ async function stage(connection,member,value){
  if(email.length>254||! /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/.test(email))throw problem('Enter a valid email address.');
  const [pending]=await connection.execute('SELECT member_id FROM profile_email_requests WHERE member_id=? AND last_sent_at>DATE_SUB(UTC_TIMESTAMP(),INTERVAL 60 SECOND)',[member.id]);
  if(pending.length)throw problem('Wait at least one minute before requesting another verification email.',429);
- try{emailSettings();}catch{throw problem('Email verification is not configured. Ask the office to configure SMTP before linking your email.',503);}
+ try{emailSettings();}catch{throw problem('Email verification is not configured. Ask the office to configure email delivery before linking your email.',503);}
  await available(connection,email,member);
  const token=crypto.randomBytes(32).toString('hex'),hash=digest(token);
  await connection.execute(`INSERT INTO profile_email_requests(member_id,username,pending_email,token_hash,expires_at,last_sent_at,created_at) VALUES(?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 1 HOUR),UTC_TIMESTAMP(),UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE username=VALUES(username),pending_email=VALUES(pending_email),token_hash=VALUES(token_hash),expires_at=VALUES(expires_at),last_sent_at=VALUES(last_sent_at),created_at=VALUES(created_at)`,[member.id,member.acc_username,email,hash]);

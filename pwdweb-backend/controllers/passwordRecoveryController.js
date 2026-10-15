@@ -1,4 +1,4 @@
-const crypto=require('node:crypto'),nodemailer=require('nodemailer'),db=require('../config/db');
+const crypto=require('node:crypto'),nodemailer=require('../utils/emailTransport'),db=require('../config/db');
 const {emailSettings}=require('../utils/registrationEmail');
 const {hashPassword}=require('../utils/accountPasswords');
 const digest=value=>crypto.createHash('sha256').update(value).digest('hex');

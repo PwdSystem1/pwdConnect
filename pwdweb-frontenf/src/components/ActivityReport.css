@@ -37,3 +37,26 @@
 
 @media print { .member-encoding-chart { break-inside: avoid; } .member-encoding-chart .encoding-desktop { display: block !important; } .member-encoding-chart .encoding-mobile, .member-encoding-chart details { display: none !important; } }
 
+
+/* Mobile records use labelled cards; desktop and print retain full tables. */
+.report-mobile-cards { display: none; }
+.report-sheet, .report-sheet > *, .report-chart { min-width: 0; }
+.report-desktop-table { max-width: 100%; }
+@media screen and (max-width: 767px) {
+ .report-mobile-cards { display: grid; gap: 16px; min-width: 0; }
+ .report-desktop-table { display: none; }
+ .report-record { min-width: 0; border: 1px solid #94a3b866; border-radius: 12px; padding: 16px; }
+ .report-record dl { margin: 0; display: grid; gap: 14px; }
+ .report-record-field { min-width: 0; }
+ .report-record dt { font-size: .8em; font-weight: 700; opacity: .8; margin-bottom: 4px; }
+ .report-record dd { margin: 0; line-height: 1.6; overflow-wrap: anywhere; word-break: normal; }
+ .report-actions > div { width: 100%; display: grid; grid-template-columns: 1fr; }
+ .report-actions button, .report-filters input { width: 100%; }
+ .report-filters input { min-width: 0; }
+ .report-filters > div > div:not([role=group]) { max-width: 100%; }
+ .report-sheet > div { padding: 16px; }
+}
+@media print {
+ .report-mobile-cards { display: none !important; }
+ .report-desktop-table { display: block !important; overflow: visible !important; }
+}

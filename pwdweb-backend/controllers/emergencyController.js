@@ -1,3 +1,4 @@
+const {timestampUtcSql}=require('../utils/timestampSql');
 const {visible}=require('../utils/operationalArchive');
 const db = require('../config/db');
 
@@ -61,7 +62,7 @@ const getEmergencyAlerts = async (req, res) => {
   const { pwd_id } = req.params;
 
   try {
-    const query = `SELECT * FROM emergency_req WHERE pwd_id = ? AND ${visible('emergency','id')} ORDER BY created_at DESC`;
+    const query = `SELECT emergency_req.*,${timestampUtcSql("created_at")} AS created_at FROM emergency_req WHERE pwd_id = ? AND ${visible('emergency','id')} ORDER BY created_at DESC`;
     const [rows] = await db.execute(query, [pwd_id]);
 
     const formattedAlerts = rows.map((row) => ({

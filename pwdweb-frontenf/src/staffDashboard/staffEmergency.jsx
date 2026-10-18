@@ -427,7 +427,7 @@ export default function StaffEmergency({
                       </div>
                       <p className={`text-[0.85em] ${t.subtle}`}>{item.category}</p>
                       <p className={`text-[0.95em] ${t.muted}`}>{item.message}</p>
-                      <p className={`text-[0.75em] ${t.subtle}`}>By: {item.sender || 'LGU Staff'} • {new Date(item.created_at).toLocaleString()}</p>
+                      <p className={`text-[0.75em] ${t.subtle}`}>By: {item.sender || 'LGU Staff'} • {new Date(item.created_at).toLocaleString('en-PH',{timeZone:'Asia/Manila'})}</p>
                     </div>
                   ))
                 ) : (
@@ -494,7 +494,7 @@ export default function StaffEmergency({
 
                         <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
                           <p className={`text-[0.8em] ${t.subtle}`}>
-                            {new Date(req.created_at).toLocaleString()}
+                            {new Date(req.created_at).toLocaleString('en-PH',{timeZone:'Asia/Manila'})}
                           </p>
 
                           <div className="flex items-center gap-2">

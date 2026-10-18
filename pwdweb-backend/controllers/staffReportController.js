@@ -1,3 +1,4 @@
+const {timestampManilaSql,timestampRangeSql,manilaEpochRange}=require('../utils/timestampSql');
 const {encodingSeries}=require('../utils/memberAnalytics');
 const db=require('../config/db');
 const {period,positive,snapshot,csvCell}=require('../utils/reportPeriod');
@@ -47,8 +48,9 @@ exports.getReport=async(req,res)=>{
    COUNT(DISTINCT CASE WHEN event_type='service_status_changed' AND LOWER(TRIM(next_status))='approved' THEN source_id END) AS approvals
    FROM report_activity ${where} GROUP BY DATE_FORMAT(occurred_at,'${datePattern}') ORDER BY date`,bind);
   const [services]=await connection.execute(`SELECT COALESCE(NULLIF(category,''),'Unspecified') AS type,COUNT(DISTINCT source_id) AS count FROM report_activity ${where} AND event_type='service_status_changed' AND LOWER(TRIM(next_status))='approved' GROUP BY category ORDER BY count DESC,category`,bind);
-  const [statuses]=await connection.execute('SELECT COALESCE(status,"Pending") AS status,COUNT(*) AS count FROM service_request WHERE created_at>=? AND created_at<? GROUP BY status',values);
-  const [requests]=await connection.execute('SELECT id,pwd_id,full_name,service_type,COALESCE(status,"Pending") AS status,DATE_FORMAT(created_at,"%Y-%m-%d %H:%i:%s") AS created_at FROM service_request WHERE created_at>=? AND created_at<? ORDER BY created_at DESC,id DESC LIMIT 50',values);
+  const sourceValues=manilaEpochRange(range.start,range.endExclusive);
+  const [statuses]=await connection.execute(`SELECT COALESCE(status,"Pending") AS status,COUNT(*) AS count FROM service_request WHERE ${timestampRangeSql("created_at")} GROUP BY status`,sourceValues);
+  const [requests]=await connection.execute(`SELECT id,pwd_id,full_name,service_type,COALESCE(status,"Pending") AS status,${timestampManilaSql("created_at")} AS created_at FROM service_request WHERE ${timestampRangeSql("created_at")} ORDER BY created_at DESC,id DESC LIMIT 50`,sourceValues);
   const [activity]=await connection.execute(`${SELECT_ACTIVITY} ${where} ORDER BY id DESC LIMIT 51`,bind);
   await connection.commit();
   const summary=Object.fromEntries(Object.entries(totals[0]).map(([key,value])=>[key,Number(value)]));

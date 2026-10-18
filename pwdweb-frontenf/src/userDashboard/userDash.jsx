@@ -382,7 +382,7 @@ export default function Dashboard({
                           {req.description}
                         </p>
                         <p className={`text-[0.8em] mt-0.5 ${t.subtle}`}>
-                          {req.created_at ? new Date(req.created_at).toLocaleDateString() : ""}
+                          {req.created_at ? new Date(req.created_at).toLocaleDateString('en-PH',{timeZone:'Asia/Manila'}) : ""}
                         </p>
                       </div>
                     </div>

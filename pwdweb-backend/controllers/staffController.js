@@ -1,3 +1,4 @@
+const {timestampUtcSql}=require('../utils/timestampSql');
 const db=require('../config/db');
 const {encodingSeries}=require('../utils/memberAnalytics');
 exports.getStaffDashboardData=async(req,res)=>{
@@ -14,7 +15,7 @@ exports.getStaffDashboardData=async(req,res)=>{
   const [disabilities]=await connection.execute(`SELECT LOWER(TRIM(disability)) AS filter,MIN(TRIM(disability)) AS label,COUNT(*) AS count FROM userdata WHERE COALESCE(TRIM(disability),'')<>'' GROUP BY LOWER(TRIM(disability)) ORDER BY count DESC,label`);
   const [birthdays]=await connection.execute(`SELECT id,pwd_id,CONCAT_WS(' ',first_name,middle_name,last_name) AS full_name,DATE_FORMAT(birthday,'%Y-%m-%d') AS birthday,
    DATE_FORMAT(birthday,'%m-%d')=DATE_FORMAT(DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR),'%m-%d') AS is_today FROM userdata WHERE MONTH(birthday)=MONTH(DATE_ADD(UTC_TIMESTAMP(),INTERVAL 8 HOUR)) ORDER BY is_today DESC,DAY(birthday),last_name,id LIMIT 100 OFFSET ${birthdayPage*100}`);
-  const [recentRequests]=await connection.execute('SELECT id,pwd_id,full_name,service_type,status,created_at FROM service_request ORDER BY id DESC LIMIT 5');
+  const [recentRequests]=await connection.execute(`SELECT id,pwd_id,full_name,service_type,status,${timestampUtcSql("created_at")} AS created_at FROM service_request ORDER BY id DESC LIMIT 5`);
   const [recentAnnouncements]=await connection.execute('SELECT id,title,content FROM announcements ORDER BY id DESC LIMIT 5');
   const today=new Date(Date.now()+28800000).toISOString().slice(0,10),month=new Date(today+'T00:00:00Z');month.setUTCDate(1);month.setUTCMonth(month.getUTCMonth()-11);const start=month.toISOString().slice(0,10);
   let tracking=null,monthly=[],analyticsAvailable=true,birthdayProgramAvailable=true,requests=[];

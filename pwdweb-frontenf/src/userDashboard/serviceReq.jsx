@@ -359,7 +359,7 @@ export default function ServiceReq({
                         {req.description}
                       </p>
                       <p className={`text-[0.8em] mt-3 font-medium ${t.subtle}`}>
-                        Submitted: {req.created_at ? new Date(req.created_at).toLocaleString() : "Recently"}
+                        Submitted: {req.created_at ? new Date(req.created_at).toLocaleString('en-PH',{timeZone:'Asia/Manila'}) : "Recently"}
                       </p>
                     </div>
                   </div>

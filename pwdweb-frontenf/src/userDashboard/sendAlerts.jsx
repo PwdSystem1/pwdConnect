@@ -355,7 +355,7 @@ export default function SendAlerts({
                     </p>
                     <p className={`text-[0.8em] mt-1.5 font-medium flex items-center gap-2 ${t.subtle}`}>
                       <Icon name="clock" className="w-4 h-4 shrink-0" />
-                      <span>Sent: {item.created_at ? new Date(item.created_at).toLocaleString() : "Recently"}</span>
+                      <span>Sent: {item.created_at ? new Date(item.created_at).toLocaleString('en-PH',{timeZone:'Asia/Manila'}) : "Recently"}</span>
                     </p>
                   </div>
                 </div>

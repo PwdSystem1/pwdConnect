@@ -53,11 +53,22 @@ const SpeechLanguageContext = createContext({language:"en",setLanguage:()=>{}});
 
 const PROGRAMS = [
   {
-    id: 1,
-    title: "Livelihood Program",
-    description: "Skills development and employment support for Persons With Disabilities.",
-    image: "https://via.placeholder.com/400x250",
-  },
+    "id": "pabirthday",
+    "title": "Pabirthday Program",
+    "description": "Birthday cash assistance for PWD members of Candelaria, subject to eligibility review and approval by the office. Contact PDAO for requirements, schedules, and availability.",
+    "image": "/images/pabirthday-program.png",
+    "fullDescription": "Birthday cash assistance for PWD members of Candelaria, subject to eligibility review and approval by the office. Contact PDAO for requirements, schedules, and availability. Staff creates a pending birthday assistance request for review. Approval and the actual release of assistance are recorded separately; creating a request does not mean payment has been made.",
+    "details": [
+      {
+        "title": "How it works",
+        "content": "Coordinate with PDAO to confirm your membership record and recorded birthday. Staff reviews eligibility and processes the request through the service workflow. Follow the schedule and release instructions confirmed by the office."
+      },
+      {
+        "title": "About this image",
+        "content": "This image is AI-generated for presentation and does not show an actual distribution or beneficiary."
+      }
+    ]
+  }
 ];
 
 const PASTPRO = [
@@ -390,10 +401,11 @@ function AccessibilityDropdown({
 
 // Section Speak controls retain the original layout and support translated narration.
 const FILIPINO_SPEECH = {
+ "Pabirthday Program. Birthday cash assistance for PWD members of Candelaria, subject to eligibility review and approval by the office. Contact PDAO for requirements, schedules, and availability.": "Programang Pabirthday. Tulong pinansyal sa kaarawan para sa mga miyembrong PWD ng Candelaria, alinsunod sa pagsusuri ng kwalipikasyon at pag-apruba ng opisina. Makipag-ugnayan sa PDAO para sa mga kinakailangan, iskedyul, at pagkakaroon ng pondo.",
  "Welcome to PWDConnect Candelaria's Inclusive Information System dedicated to empowering Persons with Disabilities through accessible programs, services, announcements, and community support.": "Maligayang pagdating sa PWDConnect ng Candelaria. Layunin ng sistemang ito na suportahan ang mga taong may kapansanan sa pamamagitan ng mga programang madaling ma-access, serbisyo, anunsiyo, at tulong ng komunidad.",
- "Our Mission: To advocate for the rights, welfare, and full integration of Persons with Disabilities into society by providing accessible services, livelihood assistance, and inclusive opportunities.": "Ang aming misyon ay itaguyod ang mga karapatan, kapakanan, at pakikilahok sa lipunan ng mga taong may kapansanan sa pamamagitan ng mga serbisyo, tulong sa kabuhayan, at pantay na pagkakataon.",
- "Our Vision: A barrier-free, inclusive, and compassionate Candelaria where Persons with Disabilities are empowered, respected, and active participants in community development.": "Ang aming pangarap ay isang Candelaria na walang hadlang, bukas sa lahat, at may malasakit, kung saan ang mga taong may kapansanan ay sinusuportahan, iginagalang, at aktibong nakikilahok sa pagpapaunlad ng komunidad.",
- "Core Values: Inclusivity, Integrity, Accessibility, Compassion, and Empowerment in every service provided for the Candelaria PWD community.": "Mga pangunahing pagpapahalaga: pagiging bukas sa lahat, katapatan, madaling pag-access, malasakit, at pagbibigay-kakayahan sa bawat serbisyong inihahatid sa komunidad ng PWD sa Candelaria.",
+ "Our Mission: To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance.": "Malabanan ang kahirapan at maitaas ang antas ng pamumuhay ng bawat mamamayan sa pamamagitan ng pagpapatupad ng mga epektibong programa, proyekto at serbisyong panlipunan na nagdudulot ng proteksyon sa mga karapatan at sapat na pangangalaga sa bawat tao, kaalinsabay ang aktibong paglahok ng mamamayan at iba’t ibang sektor ng lipunan upang makamit ang pangkabuhayang kaunlaran at progreso sa pamamagitan ng pantay-pantay, matapat, hayag na pamamahala at balanseng ekolohiya.",
+ "Our Vision: A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters.": "Isang lipunan na ang bawat tao ay may sapat na kalakasan at isang matatag na pamahalaan na aktibong kumikilos upang malabanan ang kahirapan at matamasa ang matiwasay at maunlad na pamumuhay, lalo at higit ay ang pamilya at pamayanang kapuspalad at lantad sa anumang uri ng panganib at kapahamakan.",
+ "Our Goal: To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living.": "Makapagkaloob ng tulong sa mga mamamayan at mga samahan mula sa iba’t ibang sektor ng lipunan upang angkop na maipatupad ang mga programa, proyekto at serbisyo na makapagpapakilos sa bawat tao, pamilya at pamayanang lantad sa anumang uri ng panganib at kapahamakan at iba pang sektor na pinaglilingkuran upang matamo ang maunlad na pamumuhay.",
  "Livelihood Program. Skills development and employment support for Persons With Disabilities.": "Programa sa kabuhayan. Pagsasanay sa mga kasanayan at suporta sa paghahanap ng trabaho para sa mga taong may kapansanan.",
  "Livelihood Program Initiative. Skills development and employment support for Persons With Disabilities.": "Proyekto sa kabuhayan. Pagsasanay sa mga kasanayan at suporta sa trabaho para sa mga taong may kapansanan.",
  "Upcoming event: PWD Medical Mission & Checkup, on July 15, 2026, at Municipal Gym, 8:00 AM. Description: Free medical consultations, eye checkups, hearing assessments, and health screenings for registered PWD beneficiaries.": "Aktibidad: Medical mission at checkup para sa PWD. Hulyo kinse, dalawang libo at dalawampu't anim, sa Municipal Gym, alas otso ng umaga. Libreng konsultasyong medikal, pagsusuri sa mata at pandinig, at pagsusuring pangkalusugan para sa mga rehistradong benepisyaryong PWD.",
@@ -769,9 +781,10 @@ function LandingPage({
           <SectionHeading
             t={t}
             title="About Us"
-            subtitle="Persons with Disability Affairs Office (PDAO) - Candelaria, Quezon"
+            subtitle="Persons with Disability Affairs Office (PDAO) — Candelaria, Quezon"
           />
 
+          <p className={`mt-5 max-w-3xl text-[0.9em] leading-relaxed ${t.muted}`}>Mission, vision, and goal of the Municipal Social Welfare and Development Office, as provided by the office.</p>
           <div className="grid md:grid-cols-3 gap-6 mt-12">
             <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
               <div>
@@ -780,7 +793,7 @@ function LandingPage({
                     <Icon name="target" className="w-6 h-6" />
                   </div>
                   <TTSControls
-                    textToSpeak="Our Mission: To advocate for the rights, welfare, and full integration of Persons with Disabilities into society by providing accessible services, livelihood assistance, and inclusive opportunities."
+                    textToSpeak="Our Mission: To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance."
                     onStop={handleStopSpeech}
                   />
                 </div>
@@ -788,7 +801,7 @@ function LandingPage({
                   Our Mission
                 </h3>
                 <p className={`mt-3 leading-relaxed ${t.body}`}>
-                  To advocate for the rights, welfare, and full integration of Persons with Disabilities into society by providing accessible services, livelihood assistance, and inclusive opportunities.
+                  To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance.
                 </p>
               </div>
             </div>
@@ -800,7 +813,7 @@ function LandingPage({
                     <Icon name="eye" className="w-6 h-6" />
                   </div>
                   <TTSControls
-                    textToSpeak="Our Vision: A barrier-free, inclusive, and compassionate Candelaria where Persons with Disabilities are empowered, respected, and active participants in community development."
+                    textToSpeak="Our Vision: A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters."
                     onStop={handleStopSpeech}
                   />
                 </div>
@@ -808,7 +821,7 @@ function LandingPage({
                   Our Vision
                 </h3>
                 <p className={`mt-3 leading-relaxed ${t.body}`}>
-                  A barrier-free, inclusive, and compassionate Candelaria where Persons with Disabilities are empowered, respected, and active participants in community development.
+                  A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters.
                 </p>
               </div>
             </div>
@@ -820,15 +833,15 @@ function LandingPage({
                     <Icon name="users" className="w-6 h-6" />
                   </div>
                   <TTSControls
-                    textToSpeak="Core Values: Inclusivity, Integrity, Accessibility, Compassion, and Empowerment in every service provided for the Candelaria PWD community."
+                    textToSpeak="Our Goal: To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living."
                     onStop={handleStopSpeech}
                   />
                 </div>
                 <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
-                  Core Values
+                  Our Goal
                 </h3>
                 <p className={`mt-3 leading-relaxed ${t.body}`}>
-                  Inclusivity, Integrity, Accessibility, Compassion, and Empowerment in every service provided for the Candelaria PWD community.
+                  To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living.
                 </p>
               </div>
             </div>
@@ -851,7 +864,7 @@ function LandingPage({
                 key={program.id}
                 className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
               >
-                <img src={program.image} alt={program.title} className="w-full h-56 object-cover bg-slate-200" />
+                <img src={program.image} alt="PWD birthday celebration with a community social worker — AI-generated image" loading="lazy" className="w-full h-56 object-cover bg-slate-200" />
                 <div className="p-6">
                   <h3 className={`text-[1.25em] font-bold ${t.heading}`}>
                     {program.title}

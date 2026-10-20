@@ -2,10 +2,10 @@ export function portalTheme(mode) {
   const focus='outline-none focus-visible:ring-4 focus-visible:ring-sky-400';
   if(mode==='contrast')return{
     page:'bg-black text-yellow-300',sidebar:'bg-black border-r-2 border-yellow-400',header:'bg-black border-b-2 border-yellow-400',
-    card:'bg-black border-2 border-yellow-400',heading:'text-yellow-400',muted:'text-yellow-200',subtle:'text-yellow-200/80',
+    card:'bg-black text-yellow-300 border-2 border-yellow-400',heading:'text-yellow-400',muted:'text-yellow-200',subtle:'text-yellow-200/80',
     active:'bg-yellow-400 text-black',idle:'text-yellow-300 hover:bg-zinc-900',tile:'bg-yellow-400 text-black',
     input:'bg-black text-yellow-300 border-2 border-yellow-400',divider:'border-yellow-400/40',
-    primary:'bg-yellow-400 text-black hover:bg-yellow-300',secondary:'border-2 border-yellow-400 hover:bg-zinc-900',
+    primary:'bg-yellow-400 text-black hover:bg-yellow-300',secondary:'bg-black text-yellow-300 border-2 border-yellow-400 hover:bg-zinc-900',
     unread:'bg-zinc-900',badge:'bg-yellow-400 text-black',error:'border-2 border-yellow-400 text-yellow-300',
     focus:'outline-none focus-visible:ring-4 focus-visible:ring-white',bubble:'bg-yellow-400 text-black',
   };

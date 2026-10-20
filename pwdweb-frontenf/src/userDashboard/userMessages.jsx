@@ -1,3 +1,4 @@
+import { handleMessageEnter } from '../components/messageKeyboard';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Plus, Search, Send, X } from 'lucide-react';
@@ -30,6 +31,7 @@ export default function UserMessages(props){
   const dialogRef=useRef(null);
   const scrollRef=useRef(null);
   const nearBottom=useRef(true);
+  const sendPending=useRef(false);
   const button=`inline-flex items-center justify-center gap-2 px-4 py-2.5 min-h-11 rounded-lg font-semibold cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed ${t.focus}`;
   const current=conversations.find(item=>Number(item.id)===conversationId);
   const messages=thread.id===conversationId?thread.messages:[];
@@ -110,13 +112,14 @@ export default function UserMessages(props){
     }catch(error){setContactError(error.message);}finally{setCreating(false);}
   }
   async function send(event){
-    event.preventDefault();if(sending||!draft.trim()||!conversationId)return;
+    event.preventDefault();if(sendPending.current||sending||threadLoading||!current||!draft.trim()||!conversationId||current.peer_kind==='admin')return;
+    sendPending.current=true;
     const target=conversationId;setSending(true);setThreadError('');
     try{
       const data=await portalRequest(`/messages/conversations/${target}/messages`,{method:'POST',body:JSON.stringify({body:draft.trim()})});
       setThread(previous=>previous.id===target?{...previous,messages:[...previous.messages.filter(item=>item.id!==data.message.id),data.message]}:previous);
       setDraft('');nearBottom.current=true;notifyPortalRefresh();
-    }catch(error){setThreadError(error.message);}finally{setSending(false);}
+    }catch(error){setThreadError(error.message);}finally{sendPending.current=false;setSending(false);}
   }
   async function loadOlder(){
     if(olderLoading||!messages.length)return;
@@ -149,7 +152,7 @@ export default function UserMessages(props){
             {thread.hasMore&&thread.id===conversationId&&<button type="button" disabled={olderLoading} onClick={loadOlder} className={`${button} ${t.secondary}`}>{olderLoading?'Loading…':'Load earlier messages'}</button>}
             {threadLoading&&!messages.length?<p role="status">Loading messages…</p>:!messages.length?<p className={`text-center py-10 ${t.muted}`}>No messages yet. Say hello below.</p>:messages.map(item=>{const mine=item.sender_kind==='user'&&item.sender_username===user.acc_username;return <div key={item.id} className={`flex ${mine?'justify-end':'justify-start'}`}><div className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 ${mine?t.bubble:t.input}`}><p className="whitespace-pre-wrap break-words text-[0.95em] leading-relaxed">{item.body}</p><p className="text-[0.7em] mt-2 opacity-75">{formatPortalDate(item.created_at)}</p></div></div>;})}
           </div>
-          {current?.peer_kind==='admin'&&<p className={`p-4 text-[0.85em] ${t.muted}`}>Administrator notice: this conversation is read-only. Contact LGU staff if you need assistance.</p>}<form onSubmit={send} className={`p-4 sm:p-5 border-t ${t.divider}`}><label htmlFor="message-body" className={`block font-semibold text-[0.85em] mb-2 ${t.heading}`}>Your message</label><textarea id="message-body" rows={3} maxLength={2000} value={draft} disabled={sending||threadLoading||!current||current.peer_kind==='admin'} onChange={event=>setDraft(event.target.value)} placeholder="Write a message…" className={`w-full rounded-xl p-3 resize-y ${t.input} ${t.focus}`}/><div className="flex items-center justify-between gap-3 mt-3"><span className={`text-[0.75em] ${t.subtle}`}>{draft.length}/2,000</span><button type="submit" disabled={sending||threadLoading||!current||current.peer_kind==='admin'||!draft.trim()} className={`${button} ${t.primary}`}><Send className="size-4" aria-hidden="true"/>{sending?'Sending…':'Send Message'}</button></div></form>
+          {current?.peer_kind==='admin'&&<p className={`p-4 text-[0.85em] ${t.muted}`}>Administrator notice: this conversation is read-only. Contact LGU staff if you need assistance.</p>}<form onSubmit={send} className={`p-4 sm:p-5 border-t ${t.divider}`}><label htmlFor="message-body" className={`block font-semibold text-[0.85em] mb-2 ${t.heading}`}>Your message</label><textarea onKeyDown={handleMessageEnter} aria-describedby="message-keyboard-hint" id="message-body" rows={3} maxLength={2000} value={draft} disabled={sending||threadLoading||!current||current.peer_kind==='admin'} onChange={event=>setDraft(event.target.value)} placeholder="Write a message…" className={`w-full rounded-xl p-3 resize-y ${t.input} ${t.focus}`}/><p id="message-keyboard-hint" className={`mt-2 text-[0.75em] ${t.subtle}`}>On desktop, Enter sends and Shift + Enter adds a new line. On mobile, tap Send Message.</p><div className="flex items-center justify-between gap-3 mt-3"><span className={`text-[0.75em] ${t.subtle}`}>{draft.length}/2,000</span><button type="submit" disabled={sending||threadLoading||!current||current.peer_kind==='admin'||!draft.trim()} className={`${button} ${t.primary}`}><Send className="size-4" aria-hidden="true"/>{sending?'Sending…':'Send Message'}</button></div></form>
         </>}
       </section>
     </div>

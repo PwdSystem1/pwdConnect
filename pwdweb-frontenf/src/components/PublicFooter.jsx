@@ -1,6 +1,6 @@
 import {Link} from 'react-router-dom';
 import PublicBrand from './PublicBrand';
-const features=['PWD registration & membership verification','Service requests & appointment tracking','Birthday assistance request processing','Emergency alerts & email notifications','Secure messaging & announcements','QR identification & service release tracking','Service ratings & feedback','Display, text-size & English reading controls'];
+const features=["Account registration & password recovery", "PWD membership verification & ID applications", "Service requests & appointment tracking", "Birthday assistance request processing", "Emergency assistance reporting & broadcast alerts", "Email notifications & announcements", "Secure messaging with LGU staff", "QR identification & service release tracking", "Service ratings & feedback", "Profile updates & linked email", "Display, text-size & English reading controls"];
 export default function PublicFooter({themeMode='light'}){
  const contrast=themeMode==='contrast',dark=themeMode==='dark';
  const surface=contrast?'bg-black text-yellow-300 border-yellow-400':dark?'bg-slate-950 text-slate-100 border-slate-800':'bg-[#0F2A47] text-white border-slate-600/40';

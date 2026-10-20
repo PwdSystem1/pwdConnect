@@ -97,7 +97,7 @@ const HOTLINES = [
   { id: 1, name: "Municipal Hall", number: "(042) 585 4390", phones: [{label:"(042) 585 4390",dial:"0425854390"}], icon: "building" },
   { id: 2, name: "Candelaria Police Station", number: "166 / 741-7244", phones: [{label:"166",dial:"166"},{label:"741-7244",dial:"7417244"}], icon: "shield" },
   { id: 3, name: "Candelaria Fire Station", number: "585-4472", phones: [{label:"585-4472",dial:"5854472"}], icon: "flame" },
-  { id: 4, name: "MDRRM Office", number: "116", phones: [{label:"116",dial:"116"}], icon: "cross" },
+  { id: 4, name: "MDRRMO", number: "116", phones: [{label:"116",dial:"116"}], icon: "cross" },
 ];
 
 /* SIMPLE LINE ICONS (walang kailangang i-install na library) */

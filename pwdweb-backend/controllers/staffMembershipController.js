@@ -1,3 +1,4 @@
+const idDocument=require('../utils/idApplicationDocument');
 const {pendingControl}=require('../utils/pendingAccountControl'),q=require('../utils/membershipQueue'),mail=require('../utils/workflowMail'),{ACCOUNT_SELECT,APPLICATION_SELECT,RECORD_SELECT,serialize,samePerson}=require('../utils/verificationWorkflow');const {db,v}=q;
 const REVIEW="SELECT *,DATE_FORMAT(appointment_at,'%Y-%m-%d %H:%i:%s') AS appointment_at,DATE_FORMAT(assessment_at,'%Y-%m-%d') AS assessment_at,DATE_FORMAT(official_expiry,'%Y-%m-%d') AS official_expiry FROM staff_application_reviews";
 function fail(res,e){console.error('Staff membership:',e.status?e.message:e.code||'unavailable');res.status(e.status||(['ER_DUP_ENTRY','ER_SIGNAL_EXCEPTION'].includes(e.code)?409:503)).json({success:false,message:e.status?e.message:'Unable to process membership. Check the migration or duplicate ID/username.'});}
@@ -25,3 +26,14 @@ async function registerEarlier(req,res,corrected=false){let c;try{
  }catch(e){if(c)try{await c.rollback();}catch{}fail(res,e);}finally{c?.release();}}
 exports.registerLegacy=(req,res)=>registerEarlier(req,res,false);
 exports.resubmit=(req,res)=>registerEarlier(req,res,true);
+
+exports.pdf=async(req,res)=>{let c;try{
+ const id=v.id(req.params.id);c=await db.getConnection();await c.beginTransaction();
+ const [apps]=await c.execute(APPLICATION_SELECT+' WHERE id=? FOR UPDATE',[id]);const app=apps[0];if(!app)throw v.problem('Application not found.',404);
+ const [accounts]=await c.execute(ACCOUNT_SELECT+' WHERE id=?',[app.account_id]);if(!accounts[0])throw v.problem('Applicant not found.',404);
+ const [reviews]=await c.execute(REVIEW+' WHERE application_id=?',[id]);const review=reviews[0];if(!review?.appointment_at)throw v.problem('Schedule the physician appointment before printing the ID form.',409);
+ const [events]=await c.execute("SELECT DATE_FORMAT(occurred_at,'%Y-%m-%d %H:%i:%s') AS scheduled_at FROM membership_workflow_events WHERE application_id=? AND action='Schedule' ORDER BY id DESC LIMIT 1",[id]);
+ const attachment=await idDocument.createAttachment(idDocument.snapshot(app,review,accounts[0],events[0]?.scheduled_at||''));
+ await c.commit();c.release();c=null;
+ res.set({'Content-Type':'application/pdf','Cache-Control':'private, no-store, max-age=0','Pragma':'no-cache','X-Content-Type-Options':'nosniff','Content-Disposition':`inline; filename="${attachment.filename}"`});res.send(attachment.content);
+ }catch(e){if(c)try{await c.rollback();}catch{}fail(res,e);}finally{c?.release();}};

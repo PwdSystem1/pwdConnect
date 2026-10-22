@@ -1,3 +1,4 @@
+import LandingContentCard from './components/LandingContentCard';
 import {PROGRAMS, PASTPRO, EVENTS} from './landingContent';
 import PageSpeech from './components/PageSpeech';
 import PublicDetailsDialog from './components/PublicDetailsDialog';
@@ -818,35 +819,8 @@ function LandingPage({
             subtitle="Programs and services offered by PDAO Candelaria to support and empower the PWD community."
           />
 
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            {PROGRAMS.map((program) => (
-              <div
-                key={program.id}
-                className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
-              >
-                <img src={program.image} alt={program.imageAlt} loading="lazy" width="1200" height="800" className="w-full aspect-[3/2] object-cover bg-slate-200" />
-                <div className="p-6 flex-1">
-                  <p className={`text-xs mb-3 ${t.muted}`}>AI-generated illustration</p>
-                  <h3 className={`text-[1.25em] font-bold ${t.heading}`}>
-                    {program.title}
-                  </h3>
-                  <p className={`mt-2 leading-relaxed ${t.body}`}>
-                    {program.description}
-                  </p>
-                  <div className="mt-4">
-                    <TTSControls
-                      textToSpeak={`${program.title}. ${program.description}`}
-                      onStop={handleStopSpeech}
-                    />
-                  </div>
-                </div>
-                <div className={`px-6 py-4 border-t flex justify-end items-center ${t.divider}`}>
-                  <button onClick={()=>setReadMore({item:program,category:"Program"})} aria-haspopup="dialog" aria-label={`Read more about ${program.title}`} className={`font-semibold px-4 py-2 min-h-11 rounded-lg cursor-pointer transition ${focusRing} ${t.outline}`}>
-                    Read More
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-4 mt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {PROGRAMS.map((program) => <LandingContentCard key={program.id} item={program} category="Program" event={false} t={t} focusRing={focusRing} onReadMore={()=>setReadMore({item:program,category:"Program"})} speech={<TTSControls textToSpeak={`${program.title}. ${program.description}`} onStop={handleStopSpeech}/>}/>)}
           </div>
         </div>
       </section>
@@ -860,35 +834,8 @@ function LandingPage({
             subtitle="Previous community activities supporting skills, health, and well-being."
           />
 
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            {PASTPRO.map((item) => (
-              <div
-                key={`project-${item.id}`}
-                className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
-              >
-                <img src={item.image} alt={item.imageAlt} loading="lazy" width="1200" height="800" className="w-full aspect-[3/2] object-cover bg-slate-200" />
-                <div className="p-6 flex-1">
-                  <p className={`text-xs mb-3 ${t.muted}`}>AI-generated illustration</p>
-                  <h3 className={`text-[1.25em] font-bold ${t.heading}`}>
-                    {item.title}
-                  </h3>
-                  <p className={`mt-2 leading-relaxed ${t.body}`}>
-                    {item.description}
-                  </p>
-                  <div className="mt-4">
-                    <TTSControls
-                      textToSpeak={`${item.title}. ${item.description}`}
-                      onStop={handleStopSpeech}
-                    />
-                  </div>
-                </div>
-                <div className={`px-6 py-4 border-t flex justify-end items-center ${t.divider}`}>
-                  <button onClick={()=>setReadMore({item:item,category:"Past Event"})} aria-haspopup="dialog" aria-label={`Read more about ${item.title}`} className={`font-semibold px-4 py-2 min-h-11 rounded-lg cursor-pointer transition ${focusRing} ${t.outline}`}>
-                    Read More
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-4 mt-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {PASTPRO.map((item) => <LandingContentCard key={item.id} item={item} category="Past Event" event={false} t={t} focusRing={focusRing} onReadMore={()=>setReadMore({item:item,category:"Past Event"})} speech={<TTSControls textToSpeak={`${item.title}. ${item.description}`} onStop={handleStopSpeech}/>}/>)}
           </div>
         </div>
       </section>
@@ -902,49 +849,8 @@ function LandingPage({
             subtitle="Join upcoming community activities. All times are Philippine Time; contact PDAO for updates."
           />
 
-          <div className="grid md:grid-cols-2 gap-6 mt-12">
-            {EVENTS.map((event) => (
-              <div
-                key={event.id}
-                className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
-              >
-                <img src={event.image} alt={event.imageAlt} loading="lazy" width="1200" height="800" className="w-full aspect-[3/2] object-cover bg-slate-200" />
-                <div className="p-7 flex-1">
-                  <p className={`text-xs mb-3 ${t.muted}`}>AI-generated illustration</p>
-                  <div className="flex flex-wrap justify-between items-center gap-3">
-                    <TTSControls
-                      textToSpeak={`Upcoming event: ${event.title}, on ${event.date}, at ${event.location}, ${event.time}. Description: ${event.description}`}
-                      onStop={handleStopSpeech}
-                    />
-                    <span className={`px-4 py-2 rounded-lg text-[0.9em] font-semibold ${t.chip}`}>
-                      {event.date}
-                    </span>
-                  </div>
-                  <h3 className={`text-[1.5em] font-bold mt-5 ${t.heading}`}>
-                    {event.title}
-                  </h3>
-                  <p className={`mt-3 font-medium flex flex-wrap items-center gap-x-5 gap-y-1.5 ${t.muted}`}>
-                    <span className="flex items-center gap-2">
-                      <Icon name="pin" className="w-5 h-5" /> {event.location}
-                    </span>
-                    <span className="flex items-center gap-2">
-                      <Icon name="clock" className="w-5 h-5" /> {event.time}
-                    </span>
-                  </p>
-                  <p className={`mt-4 leading-relaxed ${t.body}`}>
-                    {event.description}
-                  </p>
-
-                  <div className="flex justify-end items-center mt-8">
-                    <button
-                      onClick={()=>setReadMore({item:event,category:"Event"})} aria-haspopup="dialog" aria-label={`Read more about ${event.title}`} className={`px-5 py-2.5 min-h-11 rounded-lg font-semibold cursor-pointer transition ${focusRing} ${t.outline}`}
-                    >
-                      Read More
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-4 mt-6 sm:grid-cols-2 xl:grid-cols-3">
+            {EVENTS.map((event) => <LandingContentCard key={event.id} item={event} category="Event" event={true} t={t} focusRing={focusRing} onReadMore={()=>setReadMore({item:event,category:"Event"})} speech={<TTSControls textToSpeak={`${event.title}. ${event.date}. ${event.time}. ${event.location}. ${event.description}`} onStop={handleStopSpeech}/>}/>)}
           </div>
         </div>
       </section>

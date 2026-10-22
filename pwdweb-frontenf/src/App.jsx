@@ -1,3 +1,4 @@
+import {PROGRAMS, PASTPRO, EVENTS} from './landingContent';
 import PageSpeech from './components/PageSpeech';
 import PublicDetailsDialog from './components/PublicDetailsDialog';
 import StaffMembership from './staffDashboard/staffMembership';
@@ -50,47 +51,6 @@ import StaffReq from "./staffDashboard/staffReq.jsx";
 import StaffEmergency from "./staffDashboard/staffEmergency.jsx";
 import StaffAnnouncement from "./staffDashboard/staffAnnouncement.jsx"
 const SpeechLanguageContext = createContext({language:"en",setLanguage:()=>{}});
-
-const PROGRAMS = [
-  {
-    "id": "pabirthday",
-    "title": "Pabirthday Program",
-    "description": "Birthday cash assistance for PWD members of Candelaria, subject to eligibility review and approval by the office. Contact PDAO for requirements, schedules, and availability.",
-    "image": "/images/pabirthday-program.png",
-    "fullDescription": "Birthday cash assistance for PWD members of Candelaria, subject to eligibility review and approval by the office. Contact PDAO for requirements, schedules, and availability. Staff creates a pending birthday assistance request for review. Approval and the actual release of assistance are recorded separately; creating a request does not mean payment has been made.",
-    "details": [
-      {
-        "title": "How it works",
-        "content": "Coordinate with PDAO to confirm your membership record and recorded birthday. Staff reviews eligibility and processes the request through the service workflow. Follow the schedule and release instructions confirmed by the office."
-      },
-      {
-        "title": "About this image",
-        "content": "This image is AI-generated for presentation and does not show an actual distribution or beneficiary."
-      }
-    ]
-  }
-];
-
-const PASTPRO = [
-  {
-    id: 1,
-    title: "Livelihood Program",
-    description: "Skills development and employment support for Persons With Disabilities.",
-    image: "https://via.placeholder.com/400x250",
-  },
-];
-
-const EVENTS = [
-  {
-    id: 1,
-    title: "PWD Medical Mission & Checkup",
-    date: "July 15, 2026",
-    location: "Municipal Gym",
-    time: "8:00 AM",
-    description:
-      "Free medical consultations, eye checkups, hearing assessments, and health screenings for registered PWD beneficiaries.",
-  },
-];
 
 // icon = pangalan ng SVG icon (hindi na emoji)
 const HOTLINES = [
@@ -596,7 +556,7 @@ function LandingPage({
     { href: "#home", label: "Home" },
     { href: "#about", label: "About Us" },
     { href: "#programs", label: "Programs" },
-    { href: "#projects", label: "Projects" },
+    { href: "#projects", label: "Past Events" },
     { href: "#events", label: "Events" },
     { href: "#contact", label: "Contact" },
   ];
@@ -605,7 +565,7 @@ function LandingPage({
     { href: "#home", label: "Home", icon: "home" },
     { href: "#about", label: "About Us", icon: "info" },
     { href: "#programs", label: "Programs", icon: "list" },
-    { href: "#projects", label: "Projects", icon: "folder" },
+    { href: "#projects", label: "Past Events", icon: "folder" },
     { href: "#events", label: "Events", icon: "calendar" },
     { href: "#contact", label: "Contact Us", icon: "phone" },
   ];
@@ -864,8 +824,9 @@ function LandingPage({
                 key={program.id}
                 className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
               >
-                <img src={program.image} alt="PWD birthday celebration with a community social worker — AI-generated image" loading="lazy" className="w-full h-56 object-cover bg-slate-200" />
-                <div className="p-6">
+                <img src={program.image} alt={program.imageAlt} loading="lazy" width="1200" height="800" className="w-full aspect-[3/2] object-cover bg-slate-200" />
+                <div className="p-6 flex-1">
+                  <p className={`text-xs mb-3 ${t.muted}`}>AI-generated illustration</p>
                   <h3 className={`text-[1.25em] font-bold ${t.heading}`}>
                     {program.title}
                   </h3>
@@ -895,8 +856,8 @@ function LandingPage({
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
           <SectionHeading
             t={t}
-            title="Past Projects"
-            subtitle="Initiatives successfully implemented to build better opportunities for all."
+            title="Past Events"
+            subtitle="Previous community activities supporting skills, health, and well-being."
           />
 
           <div className="grid md:grid-cols-3 gap-6 mt-12">
@@ -905,25 +866,24 @@ function LandingPage({
                 key={`project-${item.id}`}
                 className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
               >
-                <div className={`w-full h-56 flex items-center justify-center ${isHighContrast ? "bg-zinc-900 text-yellow-200" : isDarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-200 text-slate-500"}`}>
-                  Project Image
-                </div>
-                <div className="p-6">
+                <img src={item.image} alt={item.imageAlt} loading="lazy" width="1200" height="800" className="w-full aspect-[3/2] object-cover bg-slate-200" />
+                <div className="p-6 flex-1">
+                  <p className={`text-xs mb-3 ${t.muted}`}>AI-generated illustration</p>
                   <h3 className={`text-[1.25em] font-bold ${t.heading}`}>
-                    {item.title} Initiative
+                    {item.title}
                   </h3>
                   <p className={`mt-2 leading-relaxed ${t.body}`}>
                     {item.description}
                   </p>
                   <div className="mt-4">
                     <TTSControls
-                      textToSpeak={`${item.title} Initiative. ${item.description}`}
+                      textToSpeak={`${item.title}. ${item.description}`}
                       onStop={handleStopSpeech}
                     />
                   </div>
                 </div>
                 <div className={`px-6 py-4 border-t flex justify-end items-center ${t.divider}`}>
-                  <button onClick={()=>setReadMore({item:{...item,title:item.title+" Initiative"},category:"Past Project"})} aria-haspopup="dialog" aria-label={`Read more about ${item.title} Initiative`} className={`font-semibold px-4 py-2 min-h-11 rounded-lg cursor-pointer transition ${focusRing} ${t.outline}`}>
+                  <button onClick={()=>setReadMore({item:item,category:"Past Event"})} aria-haspopup="dialog" aria-label={`Read more about ${item.title}`} className={`font-semibold px-4 py-2 min-h-11 rounded-lg cursor-pointer transition ${focusRing} ${t.outline}`}>
                     Read More
                   </button>
                 </div>
@@ -939,7 +899,7 @@ function LandingPage({
           <SectionHeading
             t={t}
             title="Upcoming Events"
-            subtitle="Mark your calendars for upcoming programs, medical missions, and activities."
+            subtitle="Join upcoming community activities. All times are Philippine Time; contact PDAO for updates."
           />
 
           <div className="grid md:grid-cols-2 gap-6 mt-12">
@@ -948,10 +908,9 @@ function LandingPage({
                 key={event.id}
                 className={`rounded-2xl overflow-hidden flex flex-col justify-between ${t.card}`}
               >
-                <div className={`h-56 flex items-center justify-center ${isHighContrast ? "bg-zinc-900 text-yellow-200" : isDarkMode ? "bg-slate-800 text-slate-400" : "bg-slate-200 text-slate-500"}`}>
-                  Event Image Banner
-                </div>
-                <div className="p-7">
+                <img src={event.image} alt={event.imageAlt} loading="lazy" width="1200" height="800" className="w-full aspect-[3/2] object-cover bg-slate-200" />
+                <div className="p-7 flex-1">
+                  <p className={`text-xs mb-3 ${t.muted}`}>AI-generated illustration</p>
                   <div className="flex flex-wrap justify-between items-center gap-3">
                     <TTSControls
                       textToSpeak={`Upcoming event: ${event.title}, on ${event.date}, at ${event.location}, ${event.time}. Description: ${event.description}`}

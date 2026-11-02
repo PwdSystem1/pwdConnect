@@ -1,7 +1,8 @@
 const {visible,assertVisible}=require('../utils/operationalArchive');
 const db = require("../config/db");
 
-// Matches announcements(id, pic MEDIUMBLOB NOT NULL, title VARCHAR(255), content VARCHAR(555)).
+// Optional photo: an empty Buffer satisfies existing NOT NULL BLOB schemas.
+// Responses expose an absent/empty photo as pic:null through formatAnnouncement.
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
 
 function imageMime(buffer) {
@@ -62,9 +63,11 @@ const getManagedAnnouncement=(req,res)=>detail(req,res,true);
 const createAnnouncement = async (req, res) => {
   const error = validateText(req.body);
   if (error) return res.status(400).json({ success: false, message: error });
-  let pic;
-  try { pic = decodePicture(req.body.pic); }
-  catch (error) { return res.status(400).json({ success: false, message: error.message }); }
+  let pic = Buffer.alloc(0);
+  if (Object.prototype.hasOwnProperty.call(req.body, "pic") && req.body.pic !== null && req.body.pic !== "") {
+    try { pic = decodePicture(req.body.pic); }
+    catch (error) { return res.status(400).json({ success: false, message: error.message }); }
+  }
   const title = req.body.title.trim();
   const content = req.body.content.trim();
   let c;try{c=await db.getConnection();await c.beginTransaction();const [result]=await c.execute('INSERT INTO announcements(pic,title,content) VALUES(?,?,?)',[pic,title,content]);await c.execute("INSERT INTO announcement_metadata(announcement_id,author_username,status,created_at,published_at,updated_at) VALUES(?,?,'Published',UTC_TIMESTAMP(),UTC_TIMESTAMP(),UTC_TIMESTAMP())",[result.insertId,req.portalAccount.username]);await c.commit();return res.status(201).json({success:true,message:'Announcement created successfully.',announcement:formatAnnouncement({id:result.insertId,pic,title,content,status:'Published'})});}catch(e){if(c)try{await c.rollback();}catch{}return fail(res,e);}finally{c?.release();}

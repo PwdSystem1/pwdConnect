@@ -555,20 +555,20 @@ function LandingPage({
 
   const navLinks = [
     { href: "#home", label: "Home" },
-    { href: "#about", label: "About Us" },
     { href: "#programs", label: "Programs" },
     { href: "#projects", label: "Past Events" },
     { href: "#events", label: "Events" },
     { href: "#contact", label: "Contact" },
+    { href: "#about", label: "About Us" },
   ];
 
   const quickLinks = [
     { href: "#home", label: "Home", icon: "home" },
-    { href: "#about", label: "About Us", icon: "info" },
     { href: "#programs", label: "Programs", icon: "list" },
     { href: "#projects", label: "Past Events", icon: "folder" },
     { href: "#events", label: "Events", icon: "calendar" },
     { href: "#contact", label: "Contact Us", icon: "phone" },
+    { href: "#about", label: "About Us", icon: "info" },
   ];
 
   return (

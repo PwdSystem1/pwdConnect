@@ -1,3 +1,4 @@
+import MarkAllMessagesRead,{applyMessageReadReceipt} from '../components/MarkAllMessagesRead';
 import { handleMessageEnter } from '../components/messageKeyboard';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -142,7 +143,7 @@ export default function AdminMessages(props){
     {listError&&<div role="alert" className={`rounded-xl p-4 mb-4 ${t.error}`}>{listError}<button type="button" onClick={()=>setRetry(value=>value+1)} className={`ml-3 ${button} ${t.secondary}`}>Retry</button></div>}
     <div className={`grid grid-cols-1 lg:grid-cols-[20rem_minmax(0,1fr)] rounded-2xl overflow-hidden ${t.card}`}>
       <section aria-label="Conversations" className={`${conversationId?'hidden lg:block':''} border-b lg:border-b-0 lg:border-r ${t.divider}`}>
-        <h2 className={`font-bold p-5 border-b ${t.divider} ${t.heading}`}>Conversations</h2>
+        <div className={`p-4 border-b flex flex-wrap justify-between items-center gap-2 ${t.divider}`}><h2 className={`font-bold ${t.heading}`}>Conversations</h2><MarkAllMessagesRead request={portalRequest} conversations={conversations} disabled={listLoading||!!listError} t={t} onRead={upTo=>setConversations(items=>applyMessageReadReceipt(items,upTo))}/></div>
         <div className="max-h-[65vh] overflow-y-auto">{listLoading?<p role="status" className="p-5">Loading conversations…</p>:!conversations.length?<p className={`p-5 ${t.muted}`}>No conversations yet. Select New Message to start.</p>:conversations.map(item=><button type="button" disabled={sending} key={item.id} onClick={()=>setParams({conversation:String(item.id)})} className={`block text-left w-full p-5 border-b ${t.divider} ${t.focus} ${Number(item.id)===conversationId?t.active:t.idle}`}><div className="flex items-start justify-between gap-2"><p className="font-semibold break-words">{item.peer_name}</p>{Number(item.unread_count)>0&&<span className={`text-xs px-2 py-1 rounded-full ${t.badge}`}>{item.unread_count}</span>}</div><p className="text-[0.75em] mt-1 capitalize">{item.peer_kind==='admin'?'Administrator':item.peer_kind==='staff'?'LGU Staff':'PWD Member'}</p><p className="text-[0.85em] truncate mt-2 opacity-80">{item.last_message||'No messages yet'}</p></button>)}</div>
       </section>
       <section aria-label="Conversation" className={`${!conversationId?'hidden lg:flex lg:flex-col':''} min-w-0`}>

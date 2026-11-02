@@ -689,26 +689,21 @@ export default function StaffMasterlist({
             ))}
           </section>
 
-          {/* Filters: stacked on phone, one row on PC */}
-          <section aria-label="Search and filters" className={`p-4 sm:p-5 rounded-2xl flex flex-col lg:flex-row lg:items-center gap-4 ${t.card}`}>
-            <div className="relative lg:flex-1">
-              <label htmlFor="member-search" className="sr-only">
-                Search members
-              </label>
-              <span className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${t.subtle}`}>
-                <Icon name="search" className="w-5 h-5" />
-              </span>
-              <input
+          {/* Layout-only grouping; original values and event handlers retained. */}
+          <section aria-label="Search and filters" className={`p-4 rounded-2xl space-y-4 ${t.card}`}>
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+              <div className="relative flex-1 min-w-0"><label htmlFor="member-search" className="sr-only">Search members</label><span className={`absolute left-3.5 top-1/2 -translate-y-1/2 ${t.subtle}`}><Icon name="search" className="w-5 h-5"/></span><input
                 id="member-search"
                 type="text"
                 placeholder="Search name, PWD ID, barangay, contact"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className={`w-full pl-11 pr-4 py-2.5 min-h-11 rounded-lg text-[0.95em] ${t.input} ${focusRing}`}
-              />
+              /></div>
+              <div className="flex flex-wrap gap-2 shrink-0"><button type="button" onClick={()=>navigate('/staff-qr-scanner?purpose=masterlist')} className={`px-4 py-3 rounded-lg min-h-11 font-semibold ${t.outline||t.input} ${focusRing}`}>Scan QR / look up PWD ID</button>{(scannedMember||exactPwd)&&<button type="button" onClick={clearScanned} className={`px-4 py-3 rounded-lg min-h-11 ${t.input} ${focusRing}`}>Clear scanned member filter</button>}</div>
             </div>
-
-            <div role="group" aria-label="Filter by ID status" className={`grid grid-cols-4 lg:flex gap-1 p-1 rounded-lg ${t.segTrack}`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-[1.5fr_repeat(4,minmax(0,1fr))] gap-3 items-end">
+              <div className="min-w-0 sm:col-span-2 xl:col-span-1"><p className="font-semibold text-[0.85em] mb-2">PWD ID status</p><div role="group" aria-label="Filter by ID status" className={`grid grid-cols-4 gap-1 p-1 rounded-lg ${t.segTrack}`}>
               {["All", "Valid", "Expiring", "Expired"].map((st) => (
                 <button
                   key={st}
@@ -719,45 +714,43 @@ export default function StaffMasterlist({
                   {st}
                 </button>
               ))}
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:flex gap-3">
-              <select
+            </div></div>
+              <div className="min-w-0"><label htmlFor="masterlist-barangay" className="block font-semibold text-[0.85em] mb-2">Barangay</label><select id="masterlist-barangay" value={barangayFilter} onChange={e=>setBarangayFilter(e.target.value)} className={`w-full min-w-0 px-3 py-2.5 min-h-11 rounded-lg text-[0.9em] ${t.input} ${focusRing}`}><option value="">All barangays</option>{barangayOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div>
+              <div className="min-w-0"><label htmlFor="masterlist-sex" className="block font-semibold text-[0.85em] mb-2">Sex</label><select id="masterlist-sex"
                 aria-label="Filter by sex"
                 value={sexFilter}
                 onChange={(e) => setSexFilter(e.target.value)}
-                className={`w-full px-3.5 py-2.5 min-h-11 rounded-lg text-[0.9em] font-semibold ${t.input} ${focusRing}`}
+                className={`w-full min-w-0 px-3 py-2.5 min-h-11 rounded-lg text-[0.9em] ${t.input} ${focusRing}`}
               >
                 {["All Sexes", "Male", "Female"].map((o) => (
                   <option key={o} className={t.optionBg}>
                     {o}
                   </option>
                 ))}
-              </select>
-              <select
+              </select></div>
+              <div className="min-w-0"><label htmlFor="masterlist-disability" className="block font-semibold text-[0.85em] mb-2">Disability type</label><select id="masterlist-disability"
                 aria-label="Filter by disability type"
                 value={disabilityFilter==='All Disability Types'?disabilityFilter:normalizeDisability(disabilityFilter)}
                 onChange={(e) => setDisabilityFilter(e.target.value)}
-                className={`w-full px-3.5 py-2.5 min-h-11 rounded-lg text-[0.9em] font-semibold ${t.input} ${focusRing}`}
+                className={`w-full min-w-0 px-3 py-2.5 min-h-11 rounded-lg text-[0.9em] ${t.input} ${focusRing}`}
               >
                 {["All Disability Types", ...disabilityOptions].map((o) => (
                   <option key={o} value={o==='All Disability Types'?o:normalizeDisability(o)} className={t.optionBg}>
                     {o}
                   </option>
                 ))}
-              </select>
+              </select></div>
+              <div className="min-w-0"><label htmlFor="birthday-filter" className="block font-semibold text-[0.85em] mb-2">Birthday program</label><select id="birthday-filter" value={birthdayFilter} onChange={e=>setBirthdayFilter(e.target.value)} className={`w-full min-w-0 px-3 py-2.5 min-h-11 rounded-lg text-[0.9em] ${t.input} ${focusRing}`}><option value="all">All birthdays</option><option value="today">Birthdays today</option><option value="this-month">Birthdays this month</option></select></div>
             </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 justify-between items-center text-[0.8em]"><span className={t.subtle}>Birthday dates use Asia/Manila.</span><a href="/staff-dashboard" className={`underline ${focusRing}`}>Create birthday requests in Dashboard</a></div>
           </section>
-
-          <div className="flex flex-wrap gap-3"><button type="button" onClick={()=>navigate('/staff-qr-scanner?purpose=masterlist')} className={`px-4 py-3 rounded-lg min-h-11 font-semibold ${t.outline||t.input} ${focusRing}`}>Scan QR / look up PWD ID</button>{(scannedMember||exactPwd)&&<button type="button" onClick={clearScanned} className={`px-4 py-3 rounded-lg min-h-11 ${t.input} ${focusRing}`}>Clear scanned member filter</button>}</div><section aria-label="Barangay and sorting" className={`p-4 rounded-2xl flex flex-wrap items-end gap-4 ${t.card}`}><div className="min-w-0 flex-1 basis-56"><label htmlFor="masterlist-barangay" className="block font-semibold text-[0.9em] mb-2">Barangay</label><select id="masterlist-barangay" value={barangayFilter} onChange={e=>setBarangayFilter(e.target.value)} className={`w-full p-3 rounded-lg ${t.input} ${focusRing}`}><option value="">All barangays</option>{barangayOptions.map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></div><div className="min-w-0 flex-1 basis-56"><label htmlFor="masterlist-sort" className="block font-semibold text-[0.9em] mb-2">Sort members</label><select id="masterlist-sort" value={sortOrder} onChange={e=>setSortOrder(e.target.value)} className={`w-full p-3 rounded-lg ${t.input} ${focusRing}`}><option value="name">Member name (surname A–Z)</option><option value="barangay">Barangay, then name</option><option value="disability">Disability, then name</option></select></div></section>
-          <section aria-label="Birthday filters" className={`p-4 rounded-2xl flex flex-wrap items-center gap-3 ${t.card}`}>
-            <label htmlFor="birthday-filter" className="font-semibold text-[0.9em]">Birthday program</label>
-            <select id="birthday-filter" value={birthdayFilter} onChange={e=>setBirthdayFilter(e.target.value)} className={`px-3 py-3 rounded-lg max-w-full ${t.input} ${focusRing}`}><option value="all">All birthdays</option><option value="today">Birthdays today</option><option value="this-month">Birthdays this month</option></select>
-            <span className={`text-[0.85em] ${t.subtle}`}>{filteredMembers.length} matching members · Asia/Manila</span>
-            <button type="button" onClick={()=>{setSearchParams({});setSearchTerm('');setStatusFilter('All');setSexFilter('All Sexes');setSortOrder('name');}} className={`px-3 py-3 rounded-lg font-semibold ${t.link} ${focusRing}`}>Clear filters</button>
-            <a href="/staff-dashboard" className="underline text-[0.85em]">Create birthday requests in Dashboard</a>
+          <section aria-label="Member list controls" className={`p-4 rounded-2xl space-y-3 ${t.card}`}>
+            <div className="flex flex-wrap gap-3 justify-between items-end">
+              <div className="min-w-0"><p className={`font-bold ${t.heading}`}>{filteredMembers.length} matching members</p><details className={`mt-1 text-[0.8em] max-w-xl ${t.subtle}`}><summary className={`cursor-pointer rounded ${focusRing}`}>Current filters &amp; print options</summary><p className="mt-2 break-words">{printFilters}</p><p className="mt-1">Print all ignores filters. Print filtered list uses the disability, barangay, search, ID status, sex, and birthday filters above.</p></details></div>
+              <div className="flex flex-wrap items-end gap-2 w-full sm:w-auto"><div className="min-w-0 flex-1 sm:flex-none sm:w-64"><label htmlFor="masterlist-sort" className="block text-[0.8em] font-semibold mb-1">Sort members</label><select id="masterlist-sort" value={sortOrder} onChange={e=>setSortOrder(e.target.value)} className={`w-full min-w-0 px-3 py-2.5 min-h-11 rounded-lg text-[0.9em] ${t.input} ${focusRing}`}><option value="name">Member name (surname A–Z)</option><option value="barangay">Barangay, then name</option><option value="disability">Disability, then name</option></select></div><button type="button" onClick={()=>{setSearchParams({});setSearchTerm('');setStatusFilter('All');setSexFilter('All Sexes');setSortOrder('name');}} className={`px-3 py-3 rounded-lg font-semibold ${t.link} ${focusRing}`}>Clear filters</button></div>
+            </div>
+            <MemberListPrint compact allMembers={pwdList} filteredMembers={filteredMembers} filters={printFilters} order={sortOrder} disabled={loading} t={t} themeMode={themeMode} preparedBy={[user.firstName,user.lastName].filter(Boolean).join(' ')}/>
           </section>
-          <MemberListPrint allMembers={pwdList} filteredMembers={filteredMembers} filters={printFilters} order={sortOrder} disabled={loading} t={t} themeMode={themeMode} preparedBy={[user.firstName,user.lastName].filter(Boolean).join(' ')}/>
           {/* Members */}
           <section aria-label="Members" className={`rounded-2xl overflow-hidden ${t.card}`}>
             {loading ? (

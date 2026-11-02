@@ -1,3 +1,4 @@
+import MarkAllMessagesRead,{applyMessageReadReceipt} from './MarkAllMessagesRead';
 import {logoutAccount} from './logoutAccount';
 import {speakSpeech,stopSpeech} from './speechPlayer';
 import { useEffect, useRef, useState } from 'react';
@@ -152,7 +153,7 @@ export default function AdminLayout({ user, title, children, alertActive=false, 
             </section>}
 
             {popup==='messages'&&<section id="portal-messages-dropdown" aria-label="Messages preview" className={popoverClass}>
-              <h2 className={`px-5 py-4 border-b font-semibold ${t.divider} ${t.heading}`}>Messages</h2>
+              <div className={`px-5 py-3 border-b flex flex-wrap justify-between items-center gap-2 ${t.divider}`}><h2 className={`font-semibold ${t.heading}`}>Messages</h2><MarkAllMessagesRead request={portalRequest} conversations={conversations} disabled={activityLoading||!!messageError} t={t} onRead={upTo=>{const next=applyMessageReadReceipt(conversations,upTo);setConversations(next);setMessageUnread(next.reduce((n,item)=>n+(Number(item.unread_count)||0),0));}}/></div>
               <div className="max-h-72 overflow-y-auto">{messageError?<p role="alert" className={`p-5 text-[0.85em] ${t.muted}`}>{messageError}</p>:activityLoading?<p className="p-5">Loading messages…</p>:!conversations.length?<p className={`p-5 ${t.muted}`}>No conversations yet.</p>:conversations.slice(0,5).map(item=><button type="button" key={item.id} onClick={()=>{setPopup(null);navigate(`/admin-messages?conversation=${item.id}`);}} className={`block w-full text-left px-5 py-4 border-b ${t.divider} ${t.focus} ${Number(item.unread_count)>0?t.unread:t.idle}`}><p className={`font-semibold text-[0.9em] ${t.heading}`}>{item.peer_name} <span className={`text-[0.75em] ${t.subtle}`}>({item.peer_kind==='admin'?'Admin':item.peer_kind==='staff'?'Staff':'PWD'})</span></p><p className={`text-[0.85em] mt-1 truncate ${t.muted}`}>{item.last_message||'Start a conversation'}</p></button>)}</div>
               <button type="button" onClick={()=>{setPopup(null);navigate('/admin-messages');}} className={`w-full rounded-none ${button} ${t.idle}`}>Open Messages</button>
             </section>}

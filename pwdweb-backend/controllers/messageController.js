@@ -40,6 +40,7 @@ exports.getConversations = async (req, res) => {
   try {
     const [rows] = await db.execute(`SELECT c.id, peer.account_kind AS peer_kind, peer.username AS peer_username,
       COALESCE(a.name, peer.username) AS peer_name,
+      (SELECT MAX(id) FROM portal_messages WHERE conversation_id=c.id) AS last_message_id,
       (SELECT body FROM portal_messages WHERE conversation_id=c.id ORDER BY id DESC LIMIT 1) AS last_message,
       (SELECT created_at FROM portal_messages WHERE conversation_id=c.id ORDER BY id DESC LIMIT 1) AS last_message_at,
       (SELECT COUNT(*) FROM portal_messages m WHERE m.conversation_id=c.id AND m.id > me.last_read_message_id
@@ -132,4 +133,34 @@ exports.markConversationRead = async (req, res) => {
     await db.execute(`UPDATE portal_notifications SET read_at=COALESCE(read_at,NOW()) WHERE recipient_kind=? AND recipient_username=? AND notification_type='message' AND target_path=? AND CAST(SUBSTRING_INDEX(entity_key,':',-1) AS UNSIGNED) <= ?`, [account.kind,account.username,`${account.kind==='admin'?'/admin-messages':account.kind==='staff'?'/staff-messages':'/messages'}?conversation=${conversationId}`,messageId]);
     res.json({ success: true });
   } catch (error) { failure(res,error); }
+};
+
+// Bounded read receipt: incoming messages visible in the client's list only.
+exports.markAllRead = async (req,res) => {
+  const requested=id(req.body?.up_to_id);
+  if(!requested)return res.status(400).json({success:false,message:'Invalid read receipt boundary.'});
+  const account=req.portalAccount;let connection;
+  try{
+    connection=await db.getConnection();await connection.beginTransaction();
+    const [snapshot]=await connection.execute(`SELECT COALESCE(MAX(m.id),0) AS max_id
+      FROM portal_messages m JOIN portal_participants p ON p.conversation_id=m.conversation_id
+      WHERE p.account_kind=? AND p.username=? AND m.id<=?
+      AND NOT (m.sender_kind=p.account_kind AND m.sender_username=p.username)`,[account.kind,account.username,requested]);
+    const boundary=Number(snapshot[0]?.max_id)||0;
+    if(boundary){
+      await connection.execute(`UPDATE portal_participants p
+        JOIN (SELECT conversation_id,MAX(id) AS read_id FROM portal_messages WHERE id<=? GROUP BY conversation_id) latest
+        ON latest.conversation_id=p.conversation_id
+        SET p.last_read_message_id=GREATEST(p.last_read_message_id,latest.read_id)
+        WHERE p.account_kind=? AND p.username=?`,[boundary,account.kind,account.username]);
+      await connection.execute(`UPDATE portal_notifications n
+        JOIN portal_messages m ON n.entity_key=CONCAT('message:',m.id)
+        JOIN portal_participants p ON p.conversation_id=m.conversation_id AND p.account_kind=? AND p.username=?
+        SET n.read_at=COALESCE(n.read_at,NOW())
+        WHERE n.recipient_kind=? AND n.recipient_username=? AND n.notification_type='message' AND m.id<=?
+        AND NOT (m.sender_kind=p.account_kind AND m.sender_username=p.username)`,[account.kind,account.username,account.kind,account.username,boundary]);
+    }
+    await connection.commit();return res.json({success:true,readThroughId:boundary});
+  }catch(error){if(connection)await connection.rollback();return failure(res,error);}
+  finally{connection?.release();}
 };

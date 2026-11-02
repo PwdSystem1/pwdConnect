@@ -3,6 +3,7 @@ const portalAuth = require('../middleware/messagingAuth');
 const controller = require('../controllers/messageController');
 const router = express.Router();
 router.use(portalAuth);
+router.patch('/read-all',controller.markAllRead);
 router.get('/contacts',controller.getContacts);
 router.get('/conversations',controller.getConversations);
 router.post('/conversations',controller.createConversation);

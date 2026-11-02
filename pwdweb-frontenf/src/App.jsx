@@ -717,6 +717,7 @@ function LandingPage({
                 View Programs
               </a>
               <button type="button" onClick={()=>navigate("/create-account")} className={`px-7 py-3.5 min-h-12 rounded-lg font-semibold ${focusRing} ${t.ghostBtn}`}>Create Account</button>
+              <button type="button" onClick={()=>setIsLoginOpen(true)} aria-haspopup="dialog" className={`px-7 py-3.5 min-h-12 rounded-lg font-semibold ${focusRing} ${t.outline}`}>Sign In</button>
             </div>
             <ul aria-label="PWDConnect values" className={`flex flex-wrap gap-x-5 gap-y-3 mt-6 text-[0.9em] ${t.muted}`}>
               {["Inclusive", "Accessible", "Empowering"].map((item) => (
@@ -736,79 +737,7 @@ function LandingPage({
         </div>
       </section>
 
-      {/* 3. ABOUT US SECTION */}
-      <section id="about" className={`py-16 md:py-24 ${t.secB}`}>
-        <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <SectionHeading
-            t={t}
-            title="About Us"
-            subtitle="Persons with Disability Affairs Office (PDAO) — Candelaria, Quezon"
-          />
 
-          <p className={`mt-5 max-w-3xl text-[0.9em] leading-relaxed ${t.muted}`}>Mission, vision, and goal of the Municipal Social Welfare and Development Office, as provided by the office.</p>
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
-              <div>
-                <div className="flex justify-between items-start gap-3 mb-5">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${t.tile}`}>
-                    <Icon name="target" className="w-6 h-6" />
-                  </div>
-                  <TTSControls
-                    textToSpeak="Our Mission: To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance."
-                    onStop={handleStopSpeech}
-                  />
-                </div>
-                <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
-                  Our Mission
-                </h3>
-                <p className={`mt-3 leading-relaxed ${t.body}`}>
-                  To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance.
-                </p>
-              </div>
-            </div>
-
-            <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
-              <div>
-                <div className="flex justify-between items-start gap-3 mb-5">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${t.tile}`}>
-                    <Icon name="eye" className="w-6 h-6" />
-                  </div>
-                  <TTSControls
-                    textToSpeak="Our Vision: A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters."
-                    onStop={handleStopSpeech}
-                  />
-                </div>
-                <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
-                  Our Vision
-                </h3>
-                <p className={`mt-3 leading-relaxed ${t.body}`}>
-                  A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters.
-                </p>
-              </div>
-            </div>
-
-            <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
-              <div>
-                <div className="flex justify-between items-start gap-3 mb-5">
-                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${t.tile}`}>
-                    <Icon name="users" className="w-6 h-6" />
-                  </div>
-                  <TTSControls
-                    textToSpeak="Our Goal: To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living."
-                    onStop={handleStopSpeech}
-                  />
-                </div>
-                <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
-                  Our Goal
-                </h3>
-                <p className={`mt-3 leading-relaxed ${t.body}`}>
-                  To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* 4. PROGRAMS SECTION */}
       <section id="programs" className={`py-16 md:py-24 ${t.secA}`}>
@@ -918,14 +847,15 @@ function LandingPage({
                   <span>Welfare Building, Municipal Compound</span>
                 </p>
               </div>
-              <button
-                type="button"
-                disabled
-                aria-label="PDAO Facebook link is not yet available"
-                className={`mt-8 px-6 py-3 min-h-12 rounded-lg w-fit font-semibold opacity-60 cursor-not-allowed ${t.primary}`}
+              <a
+                href="https://www.facebook.com/profile.php?id=61565636767150"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Federation of PWD Candelaria Facebook page (opens in a new tab)"
+                className={`mt-8 px-6 py-3 min-h-12 rounded-lg w-fit font-semibold ${focusRing} ${t.primary}`}
               >
-                Facebook link coming soon
-              </button>
+                Visit Facebook Page
+              </a>
             </div>
           </div>
         </div>
@@ -961,6 +891,80 @@ function LandingPage({
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. ABOUT US SECTION */}
+      <section id="about" className={`py-16 md:py-24 ${t.secB}`}>
+        <div className="max-w-7xl mx-auto px-5 sm:px-8">
+          <SectionHeading
+            t={t}
+            title="About Us"
+            subtitle="Persons with Disability Affairs Office (PDAO) — Candelaria, Quezon"
+          />
+
+          <p className={`mt-5 max-w-3xl text-[0.9em] leading-relaxed ${t.muted}`}>Mission, vision, and goal of the Municipal Social Welfare and Development Office, as provided by the office.</p>
+          <div className="grid md:grid-cols-3 gap-6 mt-12">
+            <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
+              <div>
+                <div className="flex justify-between items-start gap-3 mb-5">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${t.tile}`}>
+                    <Icon name="target" className="w-6 h-6" />
+                  </div>
+                  <TTSControls
+                    textToSpeak="Our Mission: To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance."
+                    onStop={handleStopSpeech}
+                  />
+                </div>
+                <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
+                  Our Mission
+                </h3>
+                <p className={`mt-3 leading-relaxed ${t.body}`}>
+                  To combat poverty and improve every citizen’s standard of living by implementing effective social programs, projects, and services that protect individual rights and provide adequate care, together with the active participation of citizens and various sectors of society, to achieve economic development and progress through equitable, honest, and transparent governance and ecological balance.
+                </p>
+              </div>
+            </div>
+
+            <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
+              <div>
+                <div className="flex justify-between items-start gap-3 mb-5">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${t.tile}`}>
+                    <Icon name="eye" className="w-6 h-6" />
+                  </div>
+                  <TTSControls
+                    textToSpeak="Our Vision: A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters."
+                    onStop={handleStopSpeech}
+                  />
+                </div>
+                <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
+                  Our Vision
+                </h3>
+                <p className={`mt-3 leading-relaxed ${t.body}`}>
+                  A society where every individual is empowered and a stable government actively works to combat poverty and ensure a peaceful and prosperous life, especially for disadvantaged families and communities vulnerable to risks and disasters.
+                </p>
+              </div>
+            </div>
+
+            <div className={`p-7 rounded-2xl flex flex-col justify-between ${t.card}`}>
+              <div>
+                <div className="flex justify-between items-start gap-3 mb-5">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center shrink-0 ${t.tile}`}>
+                    <Icon name="users" className="w-6 h-6" />
+                  </div>
+                  <TTSControls
+                    textToSpeak="Our Goal: To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living."
+                    onStop={handleStopSpeech}
+                  />
+                </div>
+                <h3 className={`text-[1.4em] font-bold ${t.heading}`}>
+                  Our Goal
+                </h3>
+                <p className={`mt-3 leading-relaxed ${t.body}`}>
+                  To provide assistance to citizens and organizations, including non-governmental organizations (NGOs) and people’s organizations (POs), across various sectors of society through the appropriate implementation of programs, projects, and services that empower individuals, families, and communities vulnerable to risks and disasters, as well as other sectors served, to achieve a better standard of living.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

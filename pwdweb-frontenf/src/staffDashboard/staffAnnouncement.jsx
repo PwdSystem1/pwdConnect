@@ -240,10 +240,6 @@ export default function StaffAnnouncement({
     if (!editor || busy || pictureLoading) return;
 
     const payload = { title: title.trim(), content: content.trim() };
-    if (editor.id === null && !picture) {
-      setFormError("Please choose an announcement picture.");
-      return;
-    }
     if (picture) payload.pic = picture;
 
     if (!payload.title || !payload.content) {
@@ -474,14 +470,14 @@ export default function StaffAnnouncement({
 
           <div>
             <label htmlFor="announcement-picture" className="block font-semibold mb-2">
-              Announcement Picture {editor?.id == null ? "*" : "(replace optional)"}
+              Announcement Picture (optional)
             </label>
             <input id="announcement-picture" ref={pictureInputRef} type="file"
               accept="image/png,image/jpeg,image/webp" disabled={busy || pictureLoading}
               onChange={selectPicture} aria-describedby="announcement-picture-help"
               className={`w-full rounded-lg p-3 ${t.input} ${t.focus}`} />
             <p id="announcement-picture-help" className={`text-[0.8em] mt-2 ${t.muted}`}>
-              PNG, JPEG, or WebP. Maximum 5 MB. On edit, no new file keeps the existing picture.
+              Optional. Leave blank for a text-only announcement. PNG, JPEG, or WebP, up to 5 MB. On edit, no new file keeps the existing picture.
             </p>
             {pictureLoading && <p role="status" className="mt-2">Checking picture…</p>}
             {(picture || editor?.pic) && (

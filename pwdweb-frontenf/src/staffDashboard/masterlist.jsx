@@ -5,9 +5,122 @@ import {sortMembers} from '../components/MemberRegisterTable';
 import {useSearchParams} from 'react-router-dom';
 import {PORTAL_API} from '../components/portalApi';
 import StaffLayout from "../components/StaffLayout";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 
+
+
+function MasterlistTableScroller({ children, themeMode, t }) {
+  const viewport = useRef(null);
+  const gesture = useRef(null);
+  const suppressClick = useRef(false);
+  const releaseTimer = useRef(null);
+  const [scroll, setScroll] = useState({ left: 0, max: 0 });
+  const [dragging, setDragging] = useState(false);
+
+  const sync = () => {
+    const node = viewport.current;
+    if (!node) return;
+    const max = Math.max(0, node.scrollWidth - node.clientWidth);
+    const left = Math.max(0, Math.min(max, node.scrollLeft));
+    setScroll(previous => previous.max === max && previous.left === left ? previous : { left, max });
+  };
+
+  useEffect(() => {
+    const node = viewport.current;
+    if (!node) return;
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(node);
+    if (node.firstElementChild) observer.observe(node.firstElementChild);
+    return () => observer.disconnect();
+  }, [children]);
+
+  useEffect(() => () => window.clearTimeout(releaseTimer.current), []);
+
+  const moveTo = left => {
+    const node = viewport.current;
+    if (!node) return;
+    node.scrollLeft = left;
+    sync();
+  };
+
+  const finishDrag = event => {
+    const active = gesture.current;
+    if (!active || active.id !== event.pointerId) return;
+    gesture.current = null;
+    setDragging(false);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    // A drag must never trigger a row action when the mouse is released.
+    window.clearTimeout(releaseTimer.current);
+    releaseTimer.current = window.setTimeout(() => { suppressClick.current = false; }, 0);
+  };
+
+  const controls = position => (
+    <div className={`flex items-center gap-3 px-3 py-2 ${position === 'top' ? 'border-b' : 'border-t'} ${t.divider}`}>
+      <button type="button" aria-label={`Scroll member table left (${position})`}
+        disabled={scroll.left <= 1} onClick={() => moveTo(scroll.left - 360)}
+        className={`size-11 shrink-0 rounded-lg border flex items-center justify-center disabled:opacity-40 ${t.divider} ${t.iconBtn} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
+        <span aria-hidden="true">←</span>
+      </button>
+      <div className="min-w-0 flex-1">
+        {position === 'top' && <p className={`text-[0.8em] mb-1 ${t.subtle}`}>View more columns · drag the table or use the slider</p>}
+        <input type="range" min="0" max={Math.max(1, scroll.max)} step="1" value={scroll.left}
+          aria-label={`Horizontal member table scroll (${position})`}
+          aria-valuetext={`${Math.round(scroll.left)} of ${Math.round(scroll.max)} pixels`}
+          onChange={event => moveTo(Number(event.target.value))}
+          className="block w-full h-6 cursor-ew-resize"
+          style={{ accentColor: themeMode === 'contrast' ? '#fde047' : '#0284c7' }} />
+      </div>
+      <button type="button" aria-label={`Scroll member table right (${position})`}
+        disabled={scroll.left >= scroll.max - 1} onClick={() => moveTo(scroll.left + 360)}
+        className={`size-11 shrink-0 rounded-lg border flex items-center justify-center disabled:opacity-40 ${t.divider} ${t.iconBtn} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}>
+        <span aria-hidden="true">→</span>
+      </button>
+    </div>
+  );
+
+  return <div className="hidden md:block min-w-0 max-w-full">
+    {scroll.max > 1 && controls('top')}
+    <div ref={viewport} role="region" aria-label="Scrollable PWD member table" tabIndex={0}
+      className="overflow-x-auto max-w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset"
+      style={{ cursor: scroll.max > 1 ? dragging ? 'grabbing' : 'grab' : undefined, userSelect: dragging ? 'none' : undefined }}
+      onScroll={sync}
+      onPointerDown={event => {
+        if (event.pointerType !== 'mouse' || event.button !== 0 || scroll.max <= 1 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+        if (event.target.closest('button,a,input,select,textarea,label,summary,[role="button"],[contenteditable="true"]')) return;
+        window.clearTimeout(releaseTimer.current);
+        suppressClick.current = false;
+        gesture.current = { id: event.pointerId, x: event.clientX, left: viewport.current.scrollLeft, moved: false };
+      }}
+      onPointerMove={event => {
+        const active = gesture.current;
+        if (!active || active.id !== event.pointerId) return;
+        const delta = event.clientX - active.x;
+        if (!active.moved && Math.abs(delta) < 6) return;
+        if (!active.moved) {
+          active.moved = true;
+          suppressClick.current = true;
+          setDragging(true);
+          window.getSelection()?.removeAllRanges();
+          event.currentTarget.setPointerCapture(event.pointerId);
+        }
+        event.preventDefault();
+        moveTo(active.left - delta);
+      }}
+      onPointerUp={finishDrag} onPointerCancel={finishDrag}
+      onPointerLeave={() => { if (gesture.current && !gesture.current.moved) gesture.current = null; }}
+      onLostPointerCapture={() => { gesture.current = null; setDragging(false); }}
+      onClickCapture={event => {
+        if (suppressClick.current) { event.preventDefault(); event.stopPropagation(); suppressClick.current = false; }
+      }}>
+      {children}
+    </div>
+    {scroll.max > 1 && controls('bottom')}
+  </div>;
+}
 
 /* SIMPLE LINE ICONS */
 const ICONS = {
@@ -805,7 +918,7 @@ export default function StaffMasterlist({
                 </ul>
 
                 {/* Tablet / PC: table */}
-                <div className="hidden md:block overflow-x-auto">
+                <MasterlistTableScroller themeMode={themeMode} t={t}>
                   <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className={`text-[0.85em] font-semibold ${t.thead}`}>
@@ -843,7 +956,7 @@ export default function StaffMasterlist({
                       })}
                     </tbody>
                   </table>
-                </div>
+                </MasterlistTableScroller>
               </>
             )}
           </section>

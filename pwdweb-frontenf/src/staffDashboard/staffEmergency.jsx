@@ -1,5 +1,5 @@
 import RequestTrackingPanel from '../components/RequestTrackingPanel';
-import {PORTAL_API} from '../components/portalApi';
+import {PORTAL_API,portalRequest,notifyPortalRefresh} from '../components/portalApi';
 import StaffLayout from "../components/StaffLayout";
 import { useState, useEffect } from "react";
 
@@ -200,21 +200,15 @@ export default function StaffEmergency({
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      const res = await fetch(`${API_EMERGENCY_URL}/${id}`, {
+      await portalRequest(`/emergency-requests/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          status: newStatus
-        })
+        body: JSON.stringify({ status: newStatus })
       });
-      const data = await res.json();
-      if (data.success) {
-        fetchData();
-      } else {
-        alert("Failed to update status.");
-      }
+      await fetchData();
+      notifyPortalRefresh();
     } catch (err) {
       console.error("Error updating emergency status:", err);
+      alert(err.message || "Unable to update emergency status. Please try again.");
     }
   };
 

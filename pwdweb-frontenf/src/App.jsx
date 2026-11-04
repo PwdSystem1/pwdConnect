@@ -371,7 +371,7 @@ const FILIPINO_SPEECH = {
  "Livelihood Program Initiative. Skills development and employment support for Persons With Disabilities.": "Proyekto sa kabuhayan. Pagsasanay sa mga kasanayan at suporta sa trabaho para sa mga taong may kapansanan.",
  "Upcoming event: PWD Medical Mission & Checkup, on July 15, 2026, at Municipal Gym, 8:00 AM. Description: Free medical consultations, eye checkups, hearing assessments, and health screenings for registered PWD beneficiaries.": "Aktibidad: Medical mission at checkup para sa PWD. Hulyo kinse, dalawang libo at dalawampu't anim, sa Municipal Gym, alas otso ng umaga. Libreng konsultasyong medikal, pagsusuri sa mata at pandinig, at pagsusuring pangkalusugan para sa mga rehistradong benepisyaryong PWD.",
  "LGU Candelaria Quezon. Municipal Hall Compound, Poblacion, Candelaria, Quezon.": "Opisina ng pamahalaang lokal ng Candelaria. Municipal Hall Compound, Poblacion, Candelaria, Quezon.",
- "PDAO Candelaria Division. Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon. Welfare Building, Municipal Compound.": "Dibisyon ng PDAO sa Candelaria. Bisitahin ang Facebook page para sa mga update, anunsiyo, at mga aktibidad ng PWD community sa Candelaria, Quezon. Welfare Building, Municipal Compound."
+ "Federation of PWD Candelaria. Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon. Welfare Building, Municipal Compound.": "Federation of PWD Candelaria. Bisitahin ang Facebook page para sa mga update, anunsiyo, at mga aktibidad ng PWD community sa Candelaria, Quezon. Welfare Building, Municipal Compound."
 };
 function TTSControls({ textToSpeak, onStop }) {
  const {language}=useContext(SpeechLanguageContext);
@@ -830,12 +830,12 @@ function LandingPage({
               <div>
                 <div className="flex justify-between items-start gap-3">
                   <h3 className={`text-[1.6em] font-bold leading-tight ${t.heading}`}>
-                    PDAO Candelaria Division
+                    Federation of PWD Candelaria
                   </h3>
                 </div>
                 <div className="mt-3">
                   <TTSControls
-                    textToSpeak="PDAO Candelaria Division. Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon. Welfare Building, Municipal Compound."
+                    textToSpeak="Federation of PWD Candelaria. Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon. Welfare Building, Municipal Compound."
                     onStop={handleStopSpeech}
                   />
                 </div>

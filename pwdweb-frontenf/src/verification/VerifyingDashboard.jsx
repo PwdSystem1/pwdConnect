@@ -19,7 +19,7 @@ function ApplicantContacts({t}) {
  useEffect(()=>()=>stopSpeech(),[]);
  const contacts=[
   {name:'LGU Candelaria Quezon',description:'Keep track of municipal ordinances, planning updates, and official announcements.',address:'Municipal Hall Compound, Poblacion, Candelaria, Quezon',url:'https://www.facebook.com/dessicatedcoconutcapitaloftheworld',linkLabel:'Visit LGU Facebook page'},
-  {name:'PDAO Candelaria Division',description:'Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon.',address:'Welfare Building, Municipal Compound',url:'https://www.facebook.com/profile.php?id=61565636767150',linkLabel:'Visit Federation Facebook page'}
+  {name:'Federation of PWD Candelaria',description:'Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon.',address:'Welfare Building, Municipal Compound',url:'https://www.facebook.com/profile.php?id=61565636767150',linkLabel:'Visit Federation Facebook page'}
  ];
  const hotlines=[
   {name:'Municipal Hall',Icon:Building2,phones:[{label:'(042) 585 4390',dial:'0425854390'}]},

@@ -3,8 +3,9 @@ import IDApplicationFields,{emptyIDForm} from './IDApplicationFields';
 import {logoutAccount} from '../components/logoutAccount';
 import {useEffect,useState} from 'react';
 import {Link,useNavigate,useSearchParams} from 'react-router-dom';
-import {Bell,CheckCircle2,Clock3,FilePlus2,FileText,History,LockKeyhole,QrCode,RefreshCw,Save,Send,ShieldCheck,UserRound} from 'lucide-react';
+import {Bell,Building2,CheckCircle2,Clock3,ExternalLink,FilePlus2,FileText,Flame,History,LockKeyhole,MapPin,Phone,QrCode,RefreshCw,Save,Send,ShieldCheck,Siren,Square,UserRound,Volume2} from 'lucide-react';
 import {portalTheme} from '../components/portalTheme';
+import {speakSpeech,stopSpeech} from '../components/speechPlayer';
 import {PORTAL_API} from '../components/portalApi';
 import {applicantRequest} from './applicantApi';
 import {applicationLabel,emptyProfile,utcDate} from './membershipFields';
@@ -13,6 +14,55 @@ import ProfileFields from './ProfileFields';
 const views=['programs','dashboard','status','existing','apply','announcements','about','contact','profile'];
 const kindLabel=value=>value==='ExistingPWD'?'Existing PWD verification':'PWD ID application';
 function Announcements({t}){const [items,setItems]=useState(null),[error,setError]=useState(''),[retry,setRetry]=useState(0);useEffect(()=>{const controller=new AbortController();setError('');fetch(PORTAL_API+'/announcements',{signal:controller.signal}).then(async response=>{if(!response.headers.get('content-type')?.includes('application/json'))throw Error('Announcements API is unavailable.');const data=await response.json();if(!response.ok||!data.success)throw Error(data.message||'Unable to load announcements.');setItems(data.announcements||[]);}).catch(e=>{if(e.name!=='AbortError')setError(e.message);});return()=>controller.abort();},[retry]);return <><h1 className="text-2xl font-bold">Announcements</h1><p className={`mt-3 ${t.muted}`}>Updates from the PWD office.</p>{error&&<p role="alert" className={`p-4 rounded-xl mt-5 ${t.error}`}>{error} <button onClick={()=>setRetry(n=>n+1)} className="underline">Retry</button></p>}{items===null&&!error?<p role="status" className="mt-6">Loading announcements…</p>:items?.length?<div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5 mt-6">{items.map(item=><article key={item.id} className={`rounded-2xl overflow-hidden ${t.card}`}>{typeof item.pic==='string'&&/^data:image\/(png|jpeg|webp);base64,/.test(item.pic)&&<img src={item.pic} alt={item.title} className="w-full h-52 object-contain bg-slate-100" loading="lazy"/>}<div className="p-5"><h2 className="font-bold text-lg break-words">{item.title}</h2><p className={`mt-3 whitespace-pre-wrap break-words ${t.muted}`}>{item.content}</p></div></article>)}</div>:!error&&<p className={`mt-6 ${t.muted}`}>No announcements yet.</p>}</>;}
+function ApplicantContacts({t}) {
+ const [speechNotice,setSpeechNotice]=useState('');
+ useEffect(()=>()=>stopSpeech(),[]);
+ const contacts=[
+  {name:'LGU Candelaria Quezon',description:'Keep track of municipal ordinances, planning updates, and official announcements.',address:'Municipal Hall Compound, Poblacion, Candelaria, Quezon',url:'https://www.facebook.com/dessicatedcoconutcapitaloftheworld',linkLabel:'Visit LGU Facebook page'},
+  {name:'PDAO Candelaria Division',description:'Visit the Facebook page for updates, announcements, and PWD community activities in Candelaria, Quezon.',address:'Welfare Building, Municipal Compound',url:'https://www.facebook.com/profile.php?id=61565636767150',linkLabel:'Visit Federation Facebook page'}
+ ];
+ const hotlines=[
+  {name:'Municipal Hall',Icon:Building2,phones:[{label:'(042) 585 4390',dial:'0425854390'}]},
+  {name:'Candelaria Police Station',Icon:ShieldCheck,phones:[{label:'166',dial:'166'},{label:'741-7244',dial:'7417244'}]},
+  {name:'Candelaria Fire Station',Icon:Flame,phones:[{label:'585-4472',dial:'5854472'}]},
+  {name:'MDRRMO',Icon:Siren,phones:[{label:'116',dial:'116'}]}
+ ];
+ const action=`inline-flex items-center justify-center gap-2 min-h-12 px-4 py-3 rounded-lg font-semibold ${t.focus}`;
+ const readingText=[...contacts.map(c=>`${c.name}. ${c.description} ${c.address}.`),'Emergency Hotlines.',...hotlines.map(h=>`${h.name}. Phone number: ${h.phones.map(p=>p.label).join(' or ')}.`)].join(' ');
+ return <div className="space-y-6">
+  <section aria-labelledby="applicant-contact-title" className={`rounded-2xl p-5 sm:p-6 ${t.card}`}>
+   <h1 id="applicant-contact-title" className={`font-bold text-2xl sm:text-3xl ${t.heading}`}>Contact PWD Office</h1>
+   <p className={`mt-3 max-w-3xl leading-relaxed ${t.muted}`}>Find office contacts, Facebook pages, and municipal hotlines here while your account is awaiting verification.</p>
+   <div className="flex flex-wrap gap-3 mt-5">
+    <button type="button" onClick={()=>speakSpeech(readingText,'en',setSpeechNotice)} className={`${action} ${t.primary}`}><Volume2 aria-hidden="true" className="size-4 shrink-0"/>Speak contacts and hotlines</button>
+    <button type="button" onClick={()=>{stopSpeech();setSpeechNotice('');}} className={`${action} ${t.secondary}`}><Square aria-hidden="true" className="size-4 shrink-0"/>Stop</button>
+   </div>
+   {speechNotice&&<p role="status" className={`mt-3 text-sm ${t.muted}`}>{speechNotice}</p>}
+  </section>
+  <section aria-labelledby="applicant-office-contacts">
+   <h2 id="applicant-office-contacts" className={`font-bold text-xl ${t.heading}`}>Office contacts and Facebook pages</h2>
+   <div className="grid md:grid-cols-2 gap-5 mt-4">
+    {contacts.map(contact=><article key={contact.url} className={`min-w-0 rounded-2xl p-5 sm:p-6 flex flex-col ${t.card}`}>
+     <div className="flex items-start gap-3"><Building2 aria-hidden="true" className="size-6 shrink-0 mt-0.5"/><h3 className={`font-bold text-lg leading-snug break-words ${t.heading}`}>{contact.name}</h3></div>
+     <p className={`mt-4 leading-relaxed ${t.muted}`}>{contact.description}</p>
+     <p className={`flex items-start gap-2 mt-4 leading-relaxed ${t.muted}`}><MapPin aria-hidden="true" className="size-5 shrink-0 mt-0.5"/><span className="min-w-0 break-words">{contact.address}</span></p>
+     <div className="mt-auto pt-5"><a href={contact.url} target="_blank" rel="noopener noreferrer" aria-label={`${contact.linkLabel} (opens in a new tab)`} className={`w-full sm:w-auto ${action} ${t.secondary}`}><span>{contact.linkLabel}</span><ExternalLink aria-hidden="true" className="size-4 shrink-0"/></a></div>
+    </article>)}
+   </div>
+  </section>
+  <section aria-labelledby="applicant-emergency-hotlines">
+   <h2 id="applicant-emergency-hotlines" className={`font-bold text-xl ${t.heading}`}>Emergency Hotlines</h2>
+   <p className={`mt-2 leading-relaxed ${t.muted}`}>Contact the municipal office and emergency services using the numbers below. Select a number to call from a supported device.</p>
+   <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
+    {hotlines.map(({name,Icon,phones})=><article key={name} className={`min-w-0 rounded-2xl p-5 flex flex-col ${t.card}`}>
+     <Icon aria-hidden="true" className="size-6 shrink-0"/>
+     <h3 className={`font-bold mt-3 leading-snug ${t.heading}`}>{name}</h3>
+     <div className="flex flex-wrap gap-x-3 gap-y-1 mt-3">{phones.map(phone=><a key={phone.dial} href={`tel:${phone.dial}`} aria-label={`Call ${name} at ${phone.label}`} className={`min-h-12 inline-flex items-center gap-2 rounded-md underline underline-offset-4 font-semibold tabular-nums ${t.focus}`}><Phone aria-hidden="true" className="size-4 shrink-0"/><span>{phone.label}</span></a>)}</div>
+    </article>)}
+   </div>
+  </section>
+ </div>;
+}
 export default function VerifyingDashboard(props){
  const t=portalTheme(props.themeMode||'light'),navigate=useNavigate(),[params]=useSearchParams();
  const view=views.includes(params.get('view'))?params.get('view'):'dashboard';
@@ -41,6 +91,6 @@ export default function VerifyingDashboard(props){
  {view==='programs'&&<ApplicantPrograms themeMode={props.themeMode||'light'} fontSize={props.fontSize} isDyslexicFont={props.isDyslexicFont}/> }
  {view==='announcements'&&<Announcements t={t}/>}
  {view==='about'&&<section className={`rounded-2xl p-6 ${t.card}`}><h1 className="font-bold text-2xl">About PWD Services</h1><p className={`mt-4 leading-relaxed ${t.muted}`}>PWDConnect connects verified members with the PWD office, service requests, announcements, emergency tools, and their QR identification. Eligibility, documents, assistance availability, and ID issuance are determined by the LGU.</p><p className={`mt-4 ${t.muted}`}>Creating an account and verifying an email do not prove PWD membership. Staff review existing records and ID applications; the administrator gives final membership approval.</p><Link to="/verifying-dashboard?view=programs" className={`mt-6 ${button} ${t.secondary}`}>View published programs</Link></section>}
- {view==='contact'&&<section className={`rounded-2xl p-6 ${t.card}`}><h1 className="font-bold text-2xl">Contact PWD Office</h1><p className={`mt-4 leading-relaxed ${t.muted}`}>Contact the Candelaria PWD office for ID processing, record corrections, or assistance with verification. Use the contact information published on the main website.</p><Link to="/#contact" className={`mt-6 ${button} ${t.primary}`}>Open office contact information</Link></section>}
+ {view==='contact'&&<ApplicantContacts t={t}/>}
  </>}</VerificationLayout>;
 }

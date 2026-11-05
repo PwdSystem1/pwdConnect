@@ -1,3 +1,5 @@
+const localProfile=require('../utils/localProfileRules');
+const verificationAttempts=require('../utils/verificationAttempts');
 const queue=require('../utils/membershipQueue');
 const formValidation=require('../utils/workflowValidation');
 const {pendingControl}=require('../utils/pendingAccountControl');
@@ -6,17 +8,17 @@ const db=require('../config/db');
 const v=require('../utils/membershipValidation');
 const {ACCOUNT_SELECT,APPLICATION_SELECT,serialize}=require('../utils/verificationWorkflow');
 const {signPortalToken}=require('../utils/portalToken');
-function failure(res,error){console.error('Verification center:',error.code||error.message);return res.status(error.status||(error.code==='ER_DUP_ENTRY'?409:503)).json({success:false,message:error.status?error.message:'Unable to complete the request. Refresh and check the workflow migration if this continues.'});}
+function failure(res,error){console.error('Verification center:',error.code||error.message);return res.status(error.status||(error.code==='ER_DUP_ENTRY'?409:503)).json({success:false,message:error.status?error.message:'Unable to complete the request. Check the update migration and backend logs.',...(error.verificationLimits?{verificationLimits:error.verificationLimits}:{})});}
 async function rollback(connection){if(connection)try{await connection.rollback();}catch(error){console.error('Verification rollback:',error.code);}}
 exports.session=async(req,res)=>{try{
  const [accounts]=await db.execute(ACCOUNT_SELECT+' WHERE id=?',[req.applicant.id]);
  const [applications]=await db.execute(APPLICATION_SELECT+' WHERE account_id=?',[req.applicant.id]);
  const [history]=await db.execute(`SELECT action,notes,application_kind,DATE_FORMAT(created_at,'%Y-%m-%d %H:%i:%s') AS created_at FROM membership_application_events WHERE account_id=? ORDER BY id DESC LIMIT 30`,[req.applicant.id]);
  const [reviews]=await db.execute("SELECT stage,revision,notes,DATE_FORMAT(appointment_at,'%Y-%m-%dT%H:%i:%sZ') AS appointment_at,appointment_venue,email_status,official_pwd_id,DATE_FORMAT(official_expiry,'%Y-%m-%d') AS official_expiry,id_form_json FROM staff_application_reviews WHERE application_id=?",[applications[0]?.id||0]);
- const [events]=await db.execute("SELECT actor_kind,actor_username,action,notes,DATE_FORMAT(occurred_at,'%Y-%m-%dT%H:%i:%sZ') AS occurred_at FROM membership_workflow_events WHERE application_id=? ORDER BY id DESC LIMIT 100",[applications[0]?.id||0]);const review=reviews[0];return res.json({success:true,account:serialize(accounts[0]),application:serialize(applications[0]),history,workflowHistory:events,staffReview:review?{...review,idForm:review.id_form_json?JSON.parse(review.id_form_json):null,id_form_json:undefined}:null});
+ const [events]=await db.execute("SELECT actor_kind,actor_username,action,notes,DATE_FORMAT(occurred_at,'%Y-%m-%dT%H:%i:%sZ') AS occurred_at FROM membership_workflow_events WHERE application_id=? ORDER BY id DESC LIMIT 100",[applications[0]?.id||0]);const review=reviews[0];return res.json({success:true,verificationLimits:await verificationAttempts.read(db,req.applicant.id),account:serialize(accounts[0]),application:serialize(applications[0]),history,workflowHistory:events,staffReview:review?{...review,idForm:review.id_form_json?JSON.parse(review.id_form_json):null,id_form_json:undefined}:null});
 }catch(error){return failure(res,error);}};
 exports.saveProfile=async(req,res)=>{let connection;try{
- const version=v.revision(req.body?.revision),profile=v.profile(req.body?.profile,true);
+ const version=v.revision(req.body?.revision),profile=localProfile.applicantProfile(v.profile(req.body?.profile,true));
  connection=await db.getConnection();await connection.beginTransaction();
  const [accounts]=await connection.execute(ACCOUNT_SELECT+' WHERE id=? FOR UPDATE',[req.applicant.id]);const account=accounts[0];const access=await pendingControl(req.applicant.id,connection);if(access.access_status!=='Active')throw v.problem('Your account access is inactive or archived.',403);
  if(!account?.email_verified_at||account.approval_status!=='Pending')throw v.problem('This profile is no longer editable in the verification center.',409);
@@ -40,6 +42,7 @@ exports.submitApplication=async(req,res)=>{let connection;try{
  const [rows]=await connection.execute(APPLICATION_SELECT+' WHERE account_id=? FOR UPDATE',[account.id]);const current=rows[0];
  if(version!==(current?.revision||0))throw v.problem('Your request changed in another tab. Refresh before submitting.',409);
  if(current&&!['Draft','ChangesRequested'].includes(current.status))throw v.problem('A request is already under review or finalized. You cannot submit another request.',409);
+ if(kind==='ExistingPWD')await verificationAttempts.consume(connection,account.id);
  let applicationId;
  if(!current){const [result]=await connection.execute("INSERT INTO membership_applications(account_id,status,revision,application_kind,claimed_pwd_id,profile_json,review_notes,submitted_at,created_at,updated_at) VALUES(?,'Submitted',1,?,?,?,'',UTC_TIMESTAMP(),UTC_TIMESTAMP(),UTC_TIMESTAMP())",[account.id,kind,claimed||null,JSON.stringify(profile)]);applicationId=result.insertId;}
  else{applicationId=current.id;await connection.execute("UPDATE membership_applications SET status='Submitted',revision=revision+1,application_kind=?,claimed_pwd_id=?,profile_json=?,submitted_at=UTC_TIMESTAMP(),updated_at=UTC_TIMESTAMP() WHERE id=?",[kind,claimed||null,JSON.stringify(profile),current.id]);}

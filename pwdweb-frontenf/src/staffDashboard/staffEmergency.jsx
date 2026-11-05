@@ -1,3 +1,5 @@
+import BroadcastResponsesPanel from '../components/BroadcastResponsesPanel';
+import {CANDELARIA_BARANGAYS} from '../components/candelariaBarangays';
 import RequestTrackingPanel from '../components/RequestTrackingPanel';
 import {PORTAL_API,portalRequest,notifyPortalRefresh} from '../components/portalApi';
 import StaffLayout from "../components/StaffLayout";
@@ -128,7 +130,7 @@ export default function StaffEmergency({
     title: "",
     alert_type: "",
     priority: "GENERAL",
-    message: ""
+    message: "", expected_at: "", audience_mode: "All", target_barangays: []
   });
   const [broadcastHistory, setBroadcastHistory] = useState([]);
 
@@ -186,11 +188,11 @@ export default function StaffEmergency({
       });
       const data = await res.json();
       if (data.success) {
-        alert("Broadcast alert sent successfully!");
-        setBroadcastForm({ title: "", alert_type: "", priority: "GENERAL", message: "" });
+        alert(data.message || "Broadcast alert sent successfully!");
+        setBroadcastForm({ title: "", alert_type: "", priority: "GENERAL", message: "", expected_at: "", audience_mode: "All", target_barangays: [] });
         fetchData();
       } else {
-        alert("Failed to send broadcast.");
+        alert(data.message || "Failed to send broadcast.");
       }
     } catch (err) {
       console.error("Error broadcasting alert:", err);
@@ -349,10 +351,14 @@ export default function StaffEmergency({
               <div className={`p-6 sm:p-8 rounded-2xl space-y-6 ${t.card}`}>
                 <div>
                   <h3 className={`font-bold text-[1.2em] ${t.heading}`}>Broadcast Emergency Alert</h3>
-                  <p className={`text-[0.9em] ${t.subtle}`}>Alert will be sent instantly to all PWD users</p>
+                  <p className={`text-[0.9em] ${t.subtle}`}>The notice is sent immediately to the selected audience. The expected event time describes the calamity, not a delayed send time.</p>
                 </div>
 
                 <form onSubmit={handleBroadcastSubmit} className="space-y-4">
+ <div><label htmlFor="broadcast-expected" className={`block font-semibold mb-2 ${t.heading}`}>Expected emergency / calamity date and time (Manila)</label><input id="broadcast-expected" type="datetime-local" required value={broadcastForm.expected_at||''} onChange={e=>setBroadcastForm(f=>({...f,expected_at:e.target.value}))} className={`w-full min-h-12 px-4 py-3 rounded-lg ${t.input} ${focusRing}`}/></div>
+ <div><label htmlFor="broadcast-audience" className={`block font-semibold mb-2 ${t.heading}`}>Send to</label><select id="broadcast-audience" value={broadcastForm.audience_mode||'All'} onChange={e=>setBroadcastForm(f=>({...f,audience_mode:e.target.value,target_barangays:[]}))} className={`w-full min-h-12 px-4 py-3 rounded-lg ${t.input} ${focusRing}`}><option value="All">All active PWD member accounts</option><option value="Barangays">Selected barangays</option></select></div>
+ {broadcastForm.audience_mode==='Barangays'&&<fieldset className={`p-4 rounded-xl border ${t.divider}`}><legend className="font-semibold px-2">Target barangays</legend><div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">{CANDELARIA_BARANGAYS.map(b=><label key={b} className="flex items-start gap-3 min-h-11 text-sm"><input type="checkbox" className="size-5 shrink-0 mt-0.5" checked={(broadcastForm.target_barangays||[]).includes(b)} onChange={e=>setBroadcastForm(f=>({...f,target_barangays:e.target.checked?[...(f.target_barangays||[]),b]:f.target_barangays.filter(v=>v!==b)}))}/>{b}</label>)}</div></fieldset>}
+
                   <div>
                     <label className={`block text-[0.9em] font-semibold mb-1.5 ${t.heading}`}>Alert Title</label>
                     <input
@@ -402,7 +408,7 @@ export default function StaffEmergency({
                     type="submit"
                     className="w-full flex items-center justify-center gap-2 py-3.5 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-[1em] transition cursor-pointer shadow-md"
                   >
-                    <Icon name="send" className="w-5 h-5" /> Send Alert to All PWD Users
+                    <Icon name="send" className="w-5 h-5" /> Send Alert to Selected Members
                   </button>
                 </form>
               </div>
@@ -422,6 +428,7 @@ export default function StaffEmergency({
                       <p className={`text-[0.85em] ${t.subtle}`}>{item.category}</p>
                       <p className={`text-[0.95em] ${t.muted}`}>{item.message}</p>
                       <p className={`text-[0.75em] ${t.subtle}`}>By: {item.sender || 'LGU Staff'} • {new Date(item.created_at).toLocaleString('en-PH',{timeZone:'Asia/Manila'})}</p>
+<BroadcastResponsesPanel alert={item} themeMode={themeMode}/>
                     </div>
                   ))
                 ) : (

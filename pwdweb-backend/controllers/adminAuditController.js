@@ -1,3 +1,4 @@
+const auditDescriptions=require('../utils/auditDescriptions');
 const db=require('../config/db');
 // Normalize UNION string columns: the installed tables use different collations.
 const str=(value,name)=>`CONVERT(${value} USING utf8mb4) COLLATE utf8mb4_unicode_ci AS ${name}`;
@@ -30,6 +31,6 @@ exports.list=async(req,res)=>{
   const where=clauses.length?' WHERE '+clauses.join(' AND '):'';
   const [counts]=await c.execute(`SELECT COUNT(*) AS total FROM (${union}) logs${where}`,values);
   const [rows]=await c.execute(`SELECT * FROM (${union}) logs${where} ORDER BY occurred_at DESC,source ASC,event_id DESC LIMIT 25 OFFSET ${(page-1)*25}`,values);
-  await c.commit();res.json({success:true,rows:rows.map(row=>({...row,id:row.source+':'+row.event_id,occurred_at:row.occurred_at.replace(' ','T')+'Z'})),total:Number(counts[0].total),page,missing});
+  await c.commit();res.json({success:true,rows:rows.map(row=>({...row,details:auditDescriptions.readable(row),id:row.source+':'+row.event_id,occurred_at:row.occurred_at.replace(' ','T')+'Z'})),total:Number(counts[0].total),page,missing});
  }catch(e){if(c)try{await c.rollback();}catch{}console.error('Admin audit:',e.code||'unavailable');res.status(503).json({success:false,message:'Unable to load audit logs. Check the backend and existing audit table migrations.'});}finally{c?.release();}
 };

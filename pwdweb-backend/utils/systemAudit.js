@@ -1,3 +1,4 @@
+const auditDescriptions=require('./auditDescriptions');
 const db=require('../config/db');
 const {verifyPortalToken}=require('./portalToken');
 const {verifyApplicant}=require('./applicantToken');
@@ -43,9 +44,10 @@ async function record(req,res,payload,event){
  const changed=fields.filter(key=>Object.hasOwn(req.body||{},key)||Object.hasOwn(req.body?.profile||{},key));
  const status=['Pending','Under Review','Approved','Rejected','Resolved','Active','Inactive','Archived','ChangesRequested','Published','Hidden'].includes(req.body?.status||req.body?.decision)?(req.body.status||req.body.decision):null;
  const controlAction=['activate','deactivate','archive','restore'].includes(req.body?.action)?req.body.action:null;
- const detail=[req.method+' request',event.category==='Settings'&&Number.isSafeInteger(payload?.count)&&payload.count>=0&&payload.count<=500?'Records: '+payload.count:null,changed.length?'Fields: '+changed.join(', '):null,status?'Requested status/decision: '+status:null,controlAction?'Requested access action: '+controlAction:null,res.locals.auditCommitted?'Account created before email delivery':null,res.locals.auditAborted?'Response stream interrupted':null].filter(Boolean).join(' · ').slice(0,500);
+
  const outcome=res.statusCode>=200&&res.statusCode<400&&payload?.success!==false?'Success':res.locals.auditCommitted?'Partial':'Failed';
  const action=res.locals.auditCommitted?'account_created':event.action==='login'&&payload?.accountType==='password_change'?'login_password_change_required':event.action;
+ const detail=auditDescriptions.describe({action,body:req.body||{},fields:changed,outcome,count:event.category==='Settings'?payload?.count:null,committed:res.locals.auditCommitted,aborted:res.locals.auditAborted});
  await db.execute('INSERT INTO portal_audit_events(actor_kind,actor_id,actor_username,actor_name,category,action,target_type,target_ref,outcome,http_status,details,occurred_at) VALUES(?,?,?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',[who.kind,who.id,who.username,who.name,event.category,action,event.target,ids.join(' · ').slice(0,128)||'—',outcome,res.statusCode,detail]);
 }
 module.exports={initialize,identity,record};

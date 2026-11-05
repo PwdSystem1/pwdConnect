@@ -8,6 +8,7 @@ const staffEmergencyController = require('../controllers/staffEmergencyControlle
 router.get('/emergency-requests',portalAuth,staff, staffEmergencyController.getEmergencyRequests);
 router.put('/emergency-requests/:id',portalAuth,staff, staffEmergencyController.updateEmergencyStatus);
 
+router.get('/broadcast-alerts/:id/responses',portalAuth,staff,staffEmergencyController.broadcastResponses);
 router.get('/broadcast-alerts',portalAuth,staff, staffEmergencyController.getBroadcastAlerts);
 router.post('/broadcast-alerts',portalAuth,staff, staffEmergencyController.createBroadcastAlert);
 

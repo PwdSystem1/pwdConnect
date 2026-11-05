@@ -1,3 +1,4 @@
+import BroadcastSafetyControls from '../components/BroadcastSafetyControls';
 import {PORTAL_API} from '../components/portalApi';
 import UserLayout from "../components/UserLayout";
 import { useState, useEffect } from "react";
@@ -382,7 +383,8 @@ export default function ReceivedAlerts({
                     </p>
                     
                     {/* Button para sa Text-to-Speech ng bawat alert */}
-                    {alert.type === 'Received' && (
+                    {alert.type === 'Received' && <BroadcastSafetyControls alert={alert} themeMode={themeMode}/>}
+{alert.type === 'Received' && (
                       <div className="mt-4 flex items-center gap-3">
                         <button
                           onClick={() => speakAlert(alert.title, alert.message)}

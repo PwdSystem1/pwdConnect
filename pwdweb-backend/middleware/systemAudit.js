@@ -33,6 +33,7 @@ function event(method,path){
  if(/^\/api\/emergency(?:\/|$)/.test(path))return {category:'Emergencies',action:'emergency_report_submitted',target:'Emergency report'};
  if(/^\/api\/emergency-requests(?:\/|$)/.test(path))return {category:'Emergencies',action:'emergency_status_updated',target:'Emergency report'};
  if(/^\/api\/broadcast-alerts(?:\/|$)/.test(path))return {category:'Emergencies',action:'alert_broadcast',target:'Broadcast alert'};
+ if(/^\/api\/received-alerts\/\d+\/response$/.test(path))return {category:'Emergencies',action:'broadcast_response',target:'Broadcast safety response'};
  if(/^\/api\/announcements(?:\/|$)/.test(path))return {category:'Announcements',action:'announcement_'+operation,target:'Announcement'};
  if(/^\/api\/messages(?:\/|$)/.test(path))return {category:'Communications',action:path.endsWith('/messages')?'message_sent':'conversation_created',target:'Conversation'};
  if(/^\/api\/qr(?:\/|$)/.test(path))return {category:'QR',action:path.endsWith('/deliveries')?'assistance_delivered':path.endsWith('/regenerate')?'qr_regenerated':'member_lookup',target:path.endsWith('/deliveries')?'Service delivery':'QR identification'};

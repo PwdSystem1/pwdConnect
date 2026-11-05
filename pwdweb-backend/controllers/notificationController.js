@@ -50,7 +50,7 @@ async function synchronize(account) {
     FROM (SELECT a.id,a.title,a.content FROM announcements a LEFT JOIN announcement_metadata m ON m.announcement_id=a.id WHERE COALESCE(m.status,'Published')='Published' ORDER BY a.id DESC LIMIT 100) source`, identity);
   await db.execute("DELETE n FROM portal_notifications n JOIN announcement_metadata m ON n.entity_key LIKE CONCAT('announcement:',m.announcement_id,':%') WHERE n.recipient_kind=? AND n.recipient_username=? AND n.notification_type='announcement' AND m.status='Hidden'",identity);
   await db.execute(prefix + `SELECT ?,?,'alert',CONCAT('alert:',id),LEFT(CONCAT('Alert: ',title),255),LEFT(COALESCE(message,''),1000),'/received-alerts',COALESCE(created_at,NOW())
-    FROM (SELECT id,title,message,created_at FROM received_alerts ORDER BY id DESC LIMIT 100) source`, identity);
+    FROM (SELECT a.id,a.title,a.message,a.created_at FROM received_alerts a WHERE (NOT EXISTS(SELECT 1 FROM broadcast_alert_details bd WHERE bd.alert_id=a.id) OR EXISTS(SELECT 1 FROM broadcast_alert_recipients br WHERE br.alert_id=a.id AND br.member_id=?)) ORDER BY a.id DESC LIMIT 100) source`, [...identity,users[0].id]);
 }
 
 function validId(value) {

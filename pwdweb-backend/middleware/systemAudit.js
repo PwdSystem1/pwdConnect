@@ -36,6 +36,7 @@ function event(method,path){
  if(/^\/api\/received-alerts\/\d+\/response$/.test(path))return {category:'Emergencies',action:'broadcast_response',target:'Broadcast safety response'};
  if(/^\/api\/announcements(?:\/|$)/.test(path))return {category:'Announcements',action:'announcement_'+operation,target:'Announcement'};
  if(/^\/api\/messages(?:\/|$)/.test(path))return {category:'Communications',action:path.endsWith('/messages')?'message_sent':'conversation_created',target:'Conversation'};
+ if(/^\/api\/qr\/events\/\d+\/emergency-resolutions$/.test(path))return {category:'Emergencies',action:'emergency_response_validated',target:'Emergency response'};
  if(/^\/api\/qr(?:\/|$)/.test(path))return {category:'QR',action:path.endsWith('/deliveries')?'assistance_delivered':path.endsWith('/regenerate')?'qr_regenerated':'member_lookup',target:path.endsWith('/deliveries')?'Service delivery':'QR identification'};
  return {category:'Other',action:'record_'+operation,target:'System action'};
 }

@@ -4,4 +4,7 @@ const user=(req,res,next)=>req.portalAccount.kind==='user'?next():res.status(403
 const staff=(req,res,next)=>req.portalAccount.kind==='staff'?next():res.status(403).json({success:false,message:'Active staff access only.'});
 router.post('/my',user,c.getOrCreateMyQr);router.post('/my/regenerate',user,c.regenerateMyQr);
 router.post('/verify',staff,limit(120),w.lookupQr);router.post('/lookup-id',staff,limit(120),w.lookupId);router.get('/history',staff,w.history);
-router.get('/events/:eventId/details',staff,w.details);router.get('/events/:eventId/requests',staff,w.requests);router.post('/events/:eventId/deliveries',staff,limit(120),w.deliver);module.exports=router;
+router.get('/events/:eventId/details',staff,w.details);router.get('/events/:eventId/requests',staff,w.requests);router.post('/events/:eventId/deliveries',staff,limit(120),w.deliver);const emergency=require('../controllers/emergencyResolutionController');
+router.get('/events/:eventId/emergencies',staff,emergency.requests);
+router.post('/events/:eventId/emergency-resolutions',staff,limit(120),emergency.resolve);
+module.exports=router;

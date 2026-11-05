@@ -1,3 +1,4 @@
+import {useNavigate,useSearchParams} from 'react-router-dom';
 import BroadcastResponsesPanel from '../components/BroadcastResponsesPanel';
 import {CANDELARIA_BARANGAYS} from '../components/candelariaBarangays';
 import RequestTrackingPanel from '../components/RequestTrackingPanel';
@@ -121,8 +122,9 @@ export default function StaffEmergency({
 }) {
 
 
+  const navigate=useNavigate(),[params]=useSearchParams();
   const [user, setUser] = useState({ firstName: "", lastName: "", role: "Staff" });
-  const [activeTab, setActiveTab] = useState("broadcast"); 
+  const [activeTab, setActiveTab] = useState(params.get('view')==='requests'?"requests":"broadcast"); 
   
 
   // Broadcast Form State
@@ -136,7 +138,7 @@ export default function StaffEmergency({
 
   // Emergency Requests State
   const [requests, setRequests] = useState([]);
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState(params.get('resolved')?"Resolved":"All");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -509,10 +511,10 @@ export default function StaffEmergency({
                             )}
                             {status !== 'Resolved' && (
                               <button
-                                onClick={() => handleUpdateStatus(req.id, "Resolved")}
+                                onClick={() => navigate('/staff-qr-scanner?purpose=emergency&emergency_id='+req.id+'&pwd_id='+encodeURIComponent(req.pwd_id))}
                                 className={`px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-[0.85em] transition cursor-pointer ${focusRing}`}
                               >
-                                Mark Resolved
+                                Verify QR / ID to resolve
                               </button>
                             )}
                           </div>
